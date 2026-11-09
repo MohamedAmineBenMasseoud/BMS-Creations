@@ -1032,6 +1032,7 @@ function initHomepageForm() {
 
   const nameInput = document.getElementById("sub-name") || form.querySelector('input[name="name"]');
   const emailInput = document.getElementById("sub-email") || form.querySelector('input[name="email"]');
+  const messageInput = document.getElementById("sub-message") || form.querySelector('textarea[name="message"]');
   const botcheckInput = form.querySelector('input[name="botcheck"]');
 
   form.addEventListener("submit", async (e) => {
@@ -1051,6 +1052,7 @@ function initHomepageForm() {
 
     const nameVal = (nameInput ? nameInput.value : "").trim();
     const emailVal = (emailInput ? emailInput.value : "").trim();
+    const messageVal = (messageInput ? messageInput.value : "").trim();
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!nameVal || nameVal.length < 2) {
@@ -1059,6 +1061,10 @@ function initHomepageForm() {
     }
     if (!emailVal || !emailRegex.test(emailVal)) {
       if (emailInput) emailInput.focus();
+      return;
+    }
+    if (!messageVal || messageVal.length < 10) {
+      if (messageInput) messageInput.focus();
       return;
     }
 
@@ -1084,13 +1090,13 @@ function initHomepageForm() {
       name: nameVal,
       email: emailVal,
       subject: "New contact from BMS Creations homepage",
-      message: "Contact request from the homepage form",
+      message: messageVal,
       botcheck: botcheckInput && botcheckInput.checked ? "true" : "",
     };
 
     const recipientEmail = "mohamedaminebenmasseoud63@gmail.com";
     const mailtoSubject = encodeURIComponent(`[BMS Creations Homepage] Contact request from ${nameVal}`);
-    const mailtoBody = encodeURIComponent(`From: ${nameVal} (${emailVal})\n\nMessage:\nContact request from the homepage form.`);
+    const mailtoBody = encodeURIComponent(`From: ${nameVal} (${emailVal})\n\nMessage:\n${messageVal}`);
     const mailtoUrl = `mailto:${recipientEmail}?subject=${mailtoSubject}&body=${mailtoBody}`;
 
     try {
@@ -1108,6 +1114,7 @@ function initHomepageForm() {
       if (response.ok && result.success) {
         if (successMsg) successMsg.style.display = "block";
         form.reset();
+        if (messageInput) messageInput.value = "";
       } else {
         const fallbackText = dict && dict.contact && dict.contact.homeErrorMsg
           ? dict.contact.homeErrorMsg

@@ -581,15 +581,18 @@
             <form class="subscribeForm" id="subscribe-form" novalidate>
               <input type="hidden" name="access_key" value="55812487-877a-4648-a266-64f19029d19f" />
               <input type="hidden" name="subject" value="New contact from BMS Creations homepage" />
-              <input type="hidden" name="message" value="Contact request from the homepage form" />
               <input type="checkbox" name="botcheck" class="form-honeypot" tabindex="-1" autocomplete="off"
                 style="display: none;" />
 
               <div class="subscribeForm__inner">
-                <input class="textField" type="text" name="name" id="sub-name" placeholder="Your Name"
-                  data-i18n-placeholder="contact.nameLabel" required />
-                <input class="textField" type="email" name="email" id="sub-email" placeholder="Your Email"
-                  data-i18n-placeholder="contact.emailLabel" required />
+                <div class="subscribeForm__row">
+                  <input class="textField" type="text" name="name" id="sub-name" placeholder="Your Name"
+                    data-i18n-placeholder="contact.nameLabel" required />
+                  <input class="textField" type="email" name="email" id="sub-email" placeholder="Your Email"
+                    data-i18n-placeholder="contact.emailLabel" required />
+                </div>
+                <textarea class="textField" name="message" id="sub-message" placeholder="Your message"
+                  data-i18n-placeholder="contact.homeMsgPlaceholder" minlength="10" required></textarea>
                 <button class="button button--solid button--nav" id="sub-submit-btn" type="submit"
                   data-content="connect" aria-label="Connect">
                   <span class="button__inner" id="sub-btn-text" data-i18n="contact.homeConnectBtn">connect</span>
