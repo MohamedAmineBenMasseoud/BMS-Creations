@@ -2967,6 +2967,20 @@ html.loading body {
   margin-top: 1rem;
 }
 
+.subscribeForm__error {
+  display: none;
+  font-weight: 600;
+  color: #e74c3c;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.subscribeForm__error a.form-fallback-link {
+  color: inherit;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
 /* ── Minimalist Footer ── */
 .footer.rf-footer {
   background: var(--rf-dark);

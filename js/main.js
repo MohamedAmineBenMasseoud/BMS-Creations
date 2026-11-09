@@ -5,6 +5,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   initI18n();
   initSmoothScroll();
+  initScrollReveal();
   initPreloader();
   initNavigation();
   initStickyFeatures();
@@ -14,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initFlippingWordSwap();
   initPageTransition();
   initContactForm();
+  initHomepageForm();
 });
 
 /* ── 0. Lightweight Internationalization (i18n) ── */
@@ -171,6 +173,43 @@ function initSmoothScroll() {
       }
     });
   });
+}
+
+/* ── 1b. Scroll Reveal System ── */
+function initScrollReveal() {
+  const revealElements = document.querySelectorAll(".reveal");
+  if (!revealElements.length) return;
+
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "0px 0px -40px 0px",
+      }
+    );
+
+    revealElements.forEach((el) => observer.observe(el));
+  } else {
+    // If IntersectionObserver is unavailable, immediately reveal all
+    revealElements.forEach((el) => el.classList.add("visible"));
+  }
+
+  // Safety fallback: reveal any remaining hidden elements after 2500ms
+  setTimeout(() => {
+    revealElements.forEach((el) => {
+      if (!el.classList.contains("visible")) {
+        el.classList.add("visible");
+      }
+    });
+  }, 2500);
 }
 
 /* ── 2. Preloader Lifecycle (First Visit Per Session Only) ── */
@@ -969,6 +1008,125 @@ function initContactForm() {
     } catch (err) {
       if (errorMsg) {
         errorMsg.innerHTML = `Network error sending message. <br/> Send directly via email instead: <a href="${mailtoUrl}" class="form-fallback-link">${recipientEmail}</a>`;
+        errorMsg.style.display = "block";
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
+        if (btnText) btnText.textContent = originalBtnText;
+      }
+    }
+  });
+}
+
+/* ── 11. Homepage Subscribe / Conversation Form ── */
+function initHomepageForm() {
+  const form = document.getElementById("subscribe-form");
+  if (!form) return;
+
+  const successMsg = document.getElementById("sub-success");
+  const errorMsg = document.getElementById("sub-error");
+  const submitBtn = document.getElementById("sub-submit-btn") || form.querySelector('button[type="submit"]');
+  const btnText = document.getElementById("sub-btn-text") || (submitBtn ? submitBtn.querySelector(".button__inner") : null);
+
+  const nameInput = document.getElementById("sub-name") || form.querySelector('input[name="name"]');
+  const emailInput = document.getElementById("sub-email") || form.querySelector('input[name="email"]');
+  const botcheckInput = form.querySelector('input[name="botcheck"]');
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (successMsg) successMsg.style.display = "none";
+    if (errorMsg) {
+      errorMsg.style.display = "none";
+      errorMsg.innerHTML = "";
+    }
+
+    // Honeypot check
+    if (botcheckInput && botcheckInput.checked) {
+      console.warn("Honeypot triggered, submission ignored.");
+      return;
+    }
+
+    const nameVal = (nameInput ? nameInput.value : "").trim();
+    const emailVal = (emailInput ? emailInput.value : "").trim();
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!nameVal || nameVal.length < 2) {
+      if (nameInput) nameInput.focus();
+      return;
+    }
+    if (!emailVal || !emailRegex.test(emailVal)) {
+      if (emailInput) emailInput.focus();
+      return;
+    }
+
+    const currentLang = window.bmsGetLanguage ? window.bmsGetLanguage() : "en";
+    const dict = (typeof I18N !== "undefined" && I18N[currentLang]) ? I18N[currentLang] : null;
+
+    const originalBtnText = btnText ? btnText.textContent : "connect";
+    const sendingText = dict && dict.contact && dict.contact.homeConnectingBtn
+      ? dict.contact.homeConnectingBtn
+      : (currentLang === "fr" ? "envoi..." : "connecting...");
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = "0.7";
+      if (btnText) btnText.textContent = sendingText;
+    }
+
+    const accessKeyInput = form.querySelector('input[name="access_key"]');
+    const accessKey = accessKeyInput ? accessKeyInput.value : "55812487-877a-4648-a266-64f19029d19f";
+
+    const payload = {
+      access_key: accessKey,
+      name: nameVal,
+      email: emailVal,
+      subject: "New contact from BMS Creations homepage",
+      message: "Contact request from the homepage form",
+      botcheck: botcheckInput && botcheckInput.checked ? "true" : "",
+    };
+
+    const recipientEmail = "mohamedaminebenmasseoud63@gmail.com";
+    const mailtoSubject = encodeURIComponent(`[BMS Creations Homepage] Contact request from ${nameVal}`);
+    const mailtoBody = encodeURIComponent(`From: ${nameVal} (${emailVal})\n\nMessage:\nContact request from the homepage form.`);
+    const mailtoUrl = `mailto:${recipientEmail}?subject=${mailtoSubject}&body=${mailtoBody}`;
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (response.ok && result.success) {
+        if (successMsg) successMsg.style.display = "block";
+        form.reset();
+      } else {
+        const fallbackText = dict && dict.contact && dict.contact.homeErrorMsg
+          ? dict.contact.homeErrorMsg
+          : (currentLang === "fr"
+            ? "Impossible d'envoyer le message. Écrivez-moi directement :"
+            : "Could not send message. Please email directly:");
+        if (errorMsg) {
+          errorMsg.innerHTML = `${fallbackText} <a href="${mailtoUrl}" class="form-fallback-link">${recipientEmail}</a>`;
+          errorMsg.style.display = "block";
+        }
+      }
+    } catch (err) {
+      const fallbackText = dict && dict.contact && dict.contact.homeErrorMsg
+        ? dict.contact.homeErrorMsg
+        : (currentLang === "fr"
+          ? "Impossible d'envoyer le message. Écrivez-moi directement :"
+          : "Could not send message. Please email directly:");
+      if (errorMsg) {
+        errorMsg.innerHTML = `${fallbackText} <a href="${mailtoUrl}" class="form-fallback-link">${recipientEmail}</a>`;
         errorMsg.style.display = "block";
       }
     } finally {

@@ -101,6 +101,10 @@ const I18N = {
       sendingBtn: "Sending...",
       successMsg: "Thank you! Your message has been sent successfully — I'll get back to you soon.",
       errorMsg: "Something went wrong. Please try again or email me directly.",
+      homeConnectBtn: "connect",
+      homeConnectingBtn: "connecting...",
+      homeSuccessMsg: "Thank you! Message received — I'll reply promptly.",
+      homeErrorMsg: "Could not send message. Please email directly:",
     },
     footer: {
       rights: "All rights reserved.",
@@ -204,6 +208,10 @@ const I18N = {
       sendingBtn: "Envoi en cours...",
       successMsg: "Merci ! Votre message a été envoyé avec succès — je vous répondrai très prochainement.",
       errorMsg: "Une erreur s'est produite. Veuillez réessayer ou m'écrire directement par email.",
+      homeConnectBtn: "contacter",
+      homeConnectingBtn: "envoi...",
+      homeSuccessMsg: "Merci ! Message reçu — je vous répondrai rapidement.",
+      homeErrorMsg: "Impossible d'envoyer le message. Écrivez-moi directement :",
     },
     footer: {
       rights: "Tous droits réservés.",
