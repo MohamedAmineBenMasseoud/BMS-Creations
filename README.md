@@ -76,7 +76,7 @@ All project metadata is centralized in [`data/projects.js`](data/projects.js), w
 - **Zero Build Tooling:** Pure browser-native HTML, CSS, and ES6 JavaScript. No npm packages, no bundlers, no compilation steps.
 - **Single Source of Truth:** Adding, removing, or reordering a project is done exclusively in [`data/projects.js`](data/projects.js). Both the home page orbit stack and the project filter grid update automatically.
 - **Accessible & Clean Styles:** All inline `style=""` attributes have been eliminated in favor of clean CSS classes in [`css/style.css`](css/style.css).
-- **Contact Form Pipeline:** The contact form on [`contact.html`](contact.html) submits via Web3Forms fetch API with client-side field validation, an anti-spam honeypot field, loading state feedback, and an automated `mailto:` fallback link if network requests fail. Replace `TODO_WEB3FORMS_KEY` with your free access key from [web3forms.com](https://web3forms.com).
+- **Contact Form Pipeline:** The contact form on [`contact.html`](contact.html) submits via Web3Forms fetch API with client-side field validation, an anti-spam honeypot field, loading state feedback, and an automated `mailto:` fallback link if network requests fail. Replace `55812487-877a-4648-a266-64f19029d19f` with your free access key from [web3forms.com](https://web3forms.com).
 
 ---
 

@@ -2400,88 +2400,42 @@ html.loading body {
   color: var(--card-accent);
 }
 
-/* ── Collapsed Tight Deck (Default Resting State for 5 cards) ── */
-.orbit-card[data-index="0"] {
-  --active-x: calc(-2 * var(--spread, 190px));
-  transform: translateX(-50px) scale(0.92);
-  z-index: 1;
-}
-.orbit-card[data-index="1"] {
-  --active-x: calc(-1 * var(--spread, 190px));
-  transform: translateX(-25px) scale(0.96);
-  z-index: 2;
-}
-.orbit-card[data-index="2"] {
-  --active-x: 0px;
-  transform: translateX(0px) scale(1);
-  z-index: 3;
-}
-.orbit-card[data-index="3"] {
-  --active-x: calc(1 * var(--spread, 190px));
-  transform: translateX(25px) scale(0.96);
-  z-index: 2;
-}
-.orbit-card[data-index="4"] {
-  --active-x: calc(2 * var(--spread, 190px));
-  transform: translateX(50px) scale(0.92);
-  z-index: 1;
+/* ── Dynamic Orbit Deck Transforms (Desktop & Mobile) ── */
+.orbit-card {
+  --diff: 0;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.4s ease;
 }
 
-/* Active card sits in front in resting collapsed deck */
-.orbit-card.active {
-  transform: translateX(0px) scale(1);
-  z-index: 10;
+/* Desktop Resting State (not fanned) */
+.orbit-stage-wrapper:not(.is-fanned) .orbit-card {
+  transform: translateX(calc(var(--diff, 0) * 32px)) scale(calc(1 - abs(var(--diff, 0)) * 0.04));
+  z-index: calc(10 - abs(var(--diff, 0)));
+  opacity: calc(1 - abs(var(--diff, 0)) * 0.12);
 }
 
-/* ── Fanned Out State on Hover / Active for cards ── */
+.orbit-stage-wrapper:not(.is-fanned) .orbit-card.active {
+  transform: translateX(0px) scale(1);
+  z-index: 20;
+  opacity: 1;
+}
+
+/* Desktop Fanned Out State on Hover / Active */
 .orbit-card-stack:hover .orbit-card,
 .orbit-stage-wrapper:hover .orbit-card,
 .orbit-stage-wrapper.is-fanned .orbit-card {
-  transform: translateX(var(--active-x, 0px)) scale(1);
-  z-index: 5;
+  transform: translateX(calc(var(--diff, 0) * var(--spread, 190px))) scale(1);
+  z-index: calc(10 - abs(var(--diff, 0)));
+  opacity: 1;
 }
 
-.orbit-card-stack:hover .orbit-card[data-index="0"],
-.orbit-stage-wrapper:hover .orbit-card[data-index="0"],
-.orbit-stage-wrapper.is-fanned .orbit-card[data-index="0"] {
-  transform: translateX(calc(-2 * var(--spread, 190px))) scale(1);
-  z-index: 5;
-}
-
-.orbit-card-stack:hover .orbit-card[data-index="1"],
-.orbit-stage-wrapper:hover .orbit-card[data-index="1"],
-.orbit-stage-wrapper.is-fanned .orbit-card[data-index="1"] {
-  transform: translateX(calc(-1 * var(--spread, 190px))) scale(1);
-  z-index: 6;
-}
-
-.orbit-card-stack:hover .orbit-card[data-index="2"],
-.orbit-stage-wrapper:hover .orbit-card[data-index="2"],
-.orbit-stage-wrapper.is-fanned .orbit-card[data-index="2"] {
-  transform: translateX(0px) scale(1);
-  z-index: 7;
-}
-
-.orbit-card-stack:hover .orbit-card[data-index="3"],
-.orbit-stage-wrapper:hover .orbit-card[data-index="3"],
-.orbit-stage-wrapper.is-fanned .orbit-card[data-index="3"] {
-  transform: translateX(calc(1 * var(--spread, 190px))) scale(1);
-  z-index: 6;
-}
-
-.orbit-card-stack:hover .orbit-card[data-index="4"],
-.orbit-stage-wrapper:hover .orbit-card[data-index="4"],
-.orbit-stage-wrapper.is-fanned .orbit-card[data-index="4"] {
-  transform: translateX(calc(2 * var(--spread, 190px))) scale(1);
-  z-index: 5;
-}
-
-/* ── Lift Active Card without changing color or angle ── */
+/* Lift Active / Hovered Card */
 .orbit-card-stack:hover .orbit-card:hover,
 .orbit-stage-wrapper:hover .orbit-card:hover,
 .orbit-stage-wrapper.is-fanned .orbit-card.is-lifted,
 .orbit-card.is-lifted {
-  transform: translateX(var(--active-x, 0px)) translateY(calc(-1 * var(--lift, 36px))) scale(1.02) !important;
+  transform: translateX(calc(var(--diff, 0) * var(--spread, 190px))) translateY(calc(-1 * var(--lift, 36px))) scale(1.03) !important;
   z-index: 50 !important;
   box-shadow: 0 28px 60px rgba(0, 0, 0, 0.45), 0 0 35px var(--card-accent-glow);
 }
@@ -2509,19 +2463,21 @@ html.loading body {
 }
 
 .orbit-nav-btn {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.12);
   color: #0e0e0e;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.25s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  touch-action: manipulation;
+  user-select: none;
 }
 
 .orbit-nav-btn:hover {
@@ -2535,6 +2491,7 @@ html.loading body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  touch-action: manipulation;
 }
 
 .orbit-dot {
@@ -2555,9 +2512,9 @@ html.loading body {
 }
 
 /* Responsive adjustment for Orbit Deck */
-@media (max-width: 900px) {
+@media (max-width: 900px) and (min-width: 769px) {
   .orbit-card-stack {
-    --spread: 70px;
+    --spread: 120px;
     width: 290px;
     height: 440px;
   }
@@ -2570,15 +2527,91 @@ html.loading body {
   }
 }
 
-@media (max-width: 650px) {
-  .orbit-card-stack {
-    --spread: 28px;
-    width: 280px;
-    height: 420px;
+/* ── Mobile View & Carousel Scrolling (max-width: 768px) ── */
+@media (max-width: 768px) {
+  .orbit-stage-wrapper {
+    overflow: hidden;
+    touch-action: pan-y;
+    min-height: 480px;
+    padding: 0.5rem 0 1.5rem;
   }
+
+  .orbit-card-stack {
+    width: min(300px, 84vw);
+    height: 430px;
+    margin: 0 auto;
+    position: relative;
+  }
+
   .orbit-card {
-    width: 280px;
-    height: 420px;
+    width: min(300px, 84vw);
+    height: 430px;
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.35s ease,
+                box-shadow 0.35s ease;
+  }
+
+  .orbit-card__image {
+    height: 165px;
+  }
+
+  /* Active center card */
+  .orbit-card[data-diff="0"],
+  .orbit-card.active {
+    transform: translateX(0) scale(1) !important;
+    opacity: 1 !important;
+    z-index: 20 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 25px var(--card-accent-glow) !important;
+  }
+
+  /* Next card peeking on the right */
+  .orbit-card[data-diff="1"] {
+    transform: translateX(calc(100% + 20px)) scale(0.92) !important;
+    opacity: 0.35 !important;
+    z-index: 6 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+  }
+
+  /* Previous card peeking on the left */
+  .orbit-card[data-diff="-1"] {
+    transform: translateX(calc(-100% - 20px)) scale(0.92) !important;
+    opacity: 0.35 !important;
+    z-index: 6 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+  }
+
+  /* Further cards hidden offscreen */
+  .orbit-card[data-diff="2"],
+  .orbit-card[data-diff="-2"] {
+    transform: translateX(calc(var(--diff, 2) * 130%)) scale(0.85) !important;
+    opacity: 0 !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
+
+  .orbit-controls {
+    margin-top: 1.75rem;
+    gap: 1rem;
+  }
+
+  .orbit-nav-btn {
+    width: 46px;
+    height: 46px;
+    font-size: 1.25rem;
+  }
+
+  .orbit-dot {
+    width: 12px;
+    height: 12px;
+  }
+
+  .orbit-dot.active {
+    width: 28px;
   }
 }
 
@@ -2977,12 +3010,6 @@ html.loading body {
 /* ── Gallery Scrollbar Hide ── */
 .gallerySlider__inner::-webkit-scrollbar {
   display: none;
-}
-
-/* ── Orbit Deck Collapsed State Active Card Guarantee ── */
-.orbit-stage-wrapper:not(.is-fanned) .orbit-card.active {
-  transform: translateX(0px) scale(1) !important;
-  z-index: 20 !important;
 }
 
 /* ── Mobile Nav Lock ── */

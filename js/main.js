@@ -87,7 +87,7 @@ function initI18n() {
     const validLang = lang === "fr" ? "fr" : "en";
     try {
       localStorage.setItem("bms_lang", validLang);
-    } catch (e) {}
+    } catch (e) { }
     applyTranslations(validLang);
   };
 
@@ -399,7 +399,6 @@ function initOrbitCardStack() {
     const displayProjects = [...PROJECTS].sort(
       (a, b) => (b.featured === true ? 1 : 0) - (a.featured === true ? 1 : 0)
     );
-    const centerIndex = (displayProjects.length - 1) / 2;
 
     stack.innerHTML = displayProjects.map((p, index) => {
       const avatar =
@@ -414,9 +413,7 @@ function initOrbitCardStack() {
           .toUpperCase();
       const statCategory =
         p.statCategory ||
-        (p.category === "fullstack"
-          ? "Full-Stack"
-          : p.category === "interactive"
+        (p.category === "interactive"
           ? "Interactive"
           : "Web");
       const miniDesc = p.miniDesc || p.description;
@@ -428,11 +425,10 @@ function initOrbitCardStack() {
       const year = p.date ? p.date.slice(0, 4) : "2026";
       const roleText = `${p.subtitle || p.category} · ${year}`;
       const detailUrl = `projects/${p.id}/index.html`;
-      const xFactor = index - centerIndex;
       const isActive = index === 0;
 
       return `
-        <div class="orbit-card${isActive ? " active" : ""}" data-index="${index}" data-name="${escapeHtml(p.title)}"
+        <div class="orbit-card${isActive ? " active" : ""}" data-index="${index}" data-diff="${index}" data-name="${escapeHtml(p.title)}"
           data-role="${escapeHtml(roleText)}"
           data-desc="${escapeHtml(p.description)}"
           data-url="${escapeHtml(p.liveUrl)}"
@@ -440,8 +436,8 @@ function initOrbitCardStack() {
           tabindex="0"
           role="group"
           aria-roledescription="slide"
-          aria-label="${escapeHtml(p.title)} (${index + 1} of ${PROJECTS.length})"
-          style="--card-accent: ${accent}; --card-accent-glow: ${glow}; --active-x: calc(${xFactor} * var(--spread, 190px));">
+          aria-label="${escapeHtml(p.title)} (${index + 1} of ${displayProjects.length})"
+          style="--card-accent: ${accent}; --card-accent-glow: ${glow};">
           <div class="orbit-card__inner">
             <div class="orbit-card__top">
               <div class="orbit-card__avatar">${escapeHtml(avatar)}</div>
@@ -504,6 +500,9 @@ function initOrbitCardStack() {
     const url = card.getAttribute("data-url") || "#";
     const detailUrl = card.getAttribute("data-detail") || "#";
 
+    if (linkEl) linkEl.setAttribute("href", url);
+    if (detailEl) detailEl.setAttribute("href", detailUrl);
+
     if (titleEl) {
       titleEl.style.opacity = "0";
       titleEl.style.transform = "translateY(5px)";
@@ -525,97 +524,114 @@ function initOrbitCardStack() {
         descEl.textContent = desc;
         descEl.style.opacity = "1";
       }
-      if (linkEl) {
-        linkEl.setAttribute("href", url);
-      }
-      if (detailEl) {
-        detailEl.setAttribute("href", detailUrl);
-      }
     }, 120);
   }
 
   function setActiveCard(index, lift = false) {
     const isDifferent = currentlyDisplayedIndex !== index;
-    activeIndex = index;
-    currentlyDisplayedIndex = index;
+    activeIndex = (index + cards.length) % cards.length;
+    currentlyDisplayedIndex = activeIndex;
 
+    const n = cards.length;
     cards.forEach((card, i) => {
-      const isTarget = i === index;
+      let diff = (i - activeIndex) % n;
+      if (diff > n / 2) diff -= n;
+      if (diff < -n / 2) diff += n;
+
+      card.style.setProperty("--diff", diff);
+      card.setAttribute("data-diff", String(diff));
+
+      const isTarget = diff === 0;
       card.classList.toggle("active", isTarget);
       card.classList.toggle("is-lifted", isTarget && lift);
+      card.setAttribute("aria-hidden", isTarget ? "false" : "true");
     });
 
     dots.forEach((dot, i) => {
-      dot.classList.toggle("active", i === index);
+      dot.classList.toggle("active", i === activeIndex);
     });
 
-    if (isDifferent && cards[index]) {
-      updateViewingHeader(cards[index]);
+    if (isDifferent && cards[activeIndex]) {
+      updateViewingHeader(cards[activeIndex]);
     }
   }
 
   // Card events (hover & click)
   cards.forEach((card, index) => {
     const onCardHover = () => {
-      stageWrapper.classList.add("is-fanned");
-      setActiveCard(index, true);
+      if (window.innerWidth > 768) {
+        stageWrapper.classList.add("is-fanned");
+        setActiveCard(index, true);
+      }
     };
 
     card.addEventListener("mouseenter", onCardHover);
     card.addEventListener("focus", onCardHover);
 
     card.addEventListener("click", (e) => {
+      const diff = parseInt(card.getAttribute("data-diff"), 10);
       const url = card.getAttribute("data-url");
       const isArrow = e.target.closest(".orbit-card__arrow") || e.target.closest(".orbit-card__bottom");
 
-      if (isArrow) {
-        if (url) window.open(url, "_blank", "noopener,noreferrer");
+      // Clicking peeking card on mobile navigates to it
+      if (diff !== 0) {
+        e.preventDefault();
+        setActiveCard(index, true);
         return;
       }
 
-      if (
-        activeIndex === index &&
-        stageWrapper.classList.contains("is-fanned") &&
-        card.classList.contains("is-lifted")
-      ) {
-        if (url) window.open(url, "_blank", "noopener,noreferrer");
+      if (isArrow) {
+        if (url && url !== "#") window.open(url, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      if (window.innerWidth <= 768) {
+        if (url && url !== "#") window.open(url, "_blank", "noopener,noreferrer");
       } else {
-        stageWrapper.classList.add("is-fanned");
-        setActiveCard(index, true);
+        if (
+          activeIndex === index &&
+          stageWrapper.classList.contains("is-fanned") &&
+          card.classList.contains("is-lifted")
+        ) {
+          if (url && url !== "#") window.open(url, "_blank", "noopener,noreferrer");
+        } else {
+          stageWrapper.classList.add("is-fanned");
+          setActiveCard(index, true);
+        }
       }
     });
   });
 
-  // Stage wrapper hover
+  // Stage wrapper hover on desktop
   stageWrapper.addEventListener("mouseenter", () => {
-    stageWrapper.classList.add("is-fanned");
+    if (window.innerWidth > 768) {
+      stageWrapper.classList.add("is-fanned");
+    }
   });
 
-  // When leaving stage wrapper, collapse deck back to tight stack
   stageWrapper.addEventListener("mouseleave", () => {
-    stageWrapper.classList.remove("is-fanned");
-    cards.forEach((card, i) => {
-      card.classList.remove("is-lifted");
-      card.classList.toggle("active", i === activeIndex);
-    });
+    if (window.innerWidth > 768) {
+      stageWrapper.classList.remove("is-fanned");
+      cards.forEach((card, i) => {
+        card.classList.remove("is-lifted");
+      });
+    }
   });
 
   // Controls: Prev & Next buttons
   if (btnPrev) {
     btnPrev.addEventListener("click", (e) => {
       e.stopPropagation();
-      stageWrapper.classList.add("is-fanned");
-      const prev = (activeIndex - 1 + cards.length) % cards.length;
-      setActiveCard(prev, true);
+      if (window.innerWidth > 768) stageWrapper.classList.add("is-fanned");
+      setActiveCard(activeIndex - 1, true);
     });
   }
 
   if (btnNext) {
     btnNext.addEventListener("click", (e) => {
       e.stopPropagation();
-      stageWrapper.classList.add("is-fanned");
-      const next = (activeIndex + 1) % cards.length;
-      setActiveCard(next, true);
+      if (window.innerWidth > 768) stageWrapper.classList.add("is-fanned");
+      setActiveCard(activeIndex + 1, true);
     });
   }
 
@@ -625,10 +641,55 @@ function initOrbitCardStack() {
       e.stopPropagation();
       const idx = parseInt(dot.getAttribute("data-index"), 10);
       if (!isNaN(idx)) {
-        stageWrapper.classList.add("is-fanned");
+        if (window.innerWidth > 768) stageWrapper.classList.add("is-fanned");
         setActiveCard(idx, true);
       }
     });
+  });
+
+  // ── Touch Swipe Gestures for Mobile & Touch Devices ──
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchDeltaX = 0;
+  let isSwiping = false;
+
+  stageWrapper.addEventListener(
+    "touchstart",
+    (e) => {
+      if (!e.touches || !e.touches[0]) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchDeltaX = 0;
+      isSwiping = false;
+    },
+    { passive: true }
+  );
+
+  stageWrapper.addEventListener(
+    "touchmove",
+    (e) => {
+      if (!e.touches || !e.touches[0]) return;
+      touchDeltaX = e.touches[0].clientX - touchStartX;
+      const deltaY = e.touches[0].clientY - touchStartY;
+
+      if (Math.abs(touchDeltaX) > Math.abs(deltaY) && Math.abs(touchDeltaX) > 10) {
+        isSwiping = true;
+      }
+    },
+    { passive: true }
+  );
+
+  stageWrapper.addEventListener("touchend", () => {
+    if (isSwiping) {
+      const threshold = 40;
+      if (touchDeltaX < -threshold) {
+        setActiveCard(activeIndex + 1, true);
+      } else if (touchDeltaX > threshold) {
+        setActiveCard(activeIndex - 1, true);
+      }
+    }
+    isSwiping = false;
+    touchDeltaX = 0;
   });
 
   // Keyboard Accessibility (Arrow keys & Enter/Space)
@@ -639,16 +700,14 @@ function initOrbitCardStack() {
   stageWrapper.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
       e.preventDefault();
-      stageWrapper.classList.add("is-fanned");
-      const prev = (activeIndex - 1 + cards.length) % cards.length;
-      setActiveCard(prev, true);
-      if (cards[prev]) cards[prev].focus();
+      if (window.innerWidth > 768) stageWrapper.classList.add("is-fanned");
+      setActiveCard(activeIndex - 1, true);
+      if (cards[activeIndex]) cards[activeIndex].focus();
     } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
       e.preventDefault();
-      stageWrapper.classList.add("is-fanned");
-      const next = (activeIndex + 1) % cards.length;
-      setActiveCard(next, true);
-      if (cards[next]) cards[next].focus();
+      if (window.innerWidth > 768) stageWrapper.classList.add("is-fanned");
+      setActiveCard(activeIndex + 1, true);
+      if (cards[activeIndex]) cards[activeIndex].focus();
     } else if (e.key === "Enter" || e.key === " ") {
       if (document.activeElement && document.activeElement.classList.contains("orbit-card")) {
         e.preventDefault();
@@ -659,15 +718,14 @@ function initOrbitCardStack() {
   });
 
   stageWrapper.addEventListener("focusin", () => {
-    stageWrapper.classList.add("is-fanned");
+    if (window.innerWidth > 768) stageWrapper.classList.add("is-fanned");
   });
 
   stageWrapper.addEventListener("focusout", (e) => {
-    if (!stageWrapper.contains(e.relatedTarget)) {
+    if (window.innerWidth > 768 && !stageWrapper.contains(e.relatedTarget)) {
       stageWrapper.classList.remove("is-fanned");
       cards.forEach((card, i) => {
         card.classList.remove("is-lifted");
-        card.classList.toggle("active", i === activeIndex);
       });
     }
   });
@@ -870,7 +928,7 @@ function initContactForm() {
 
     // 4. Submit via Web3Forms with placeholder access key
     const accessKeyInput = form.querySelector('input[name="access_key"]');
-    const accessKey = accessKeyInput ? accessKeyInput.value : "TODO_WEB3FORMS_KEY";
+    const accessKey = accessKeyInput ? accessKeyInput.value : "55812487-877a-4648-a266-64f19029d19f";
 
     const payload = {
       access_key: accessKey,

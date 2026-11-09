@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mohamedaminebenmasseoud.github.io/BMS Creations/sitemap.xml
+Sitemap: https://mohamedaminebenmasseoud.github.io/BMS-Creations/sitemap.xml
 
