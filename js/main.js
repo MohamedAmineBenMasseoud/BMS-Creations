@@ -982,7 +982,7 @@ function initContactForm() {
       const result = await response.json().catch(() => ({}));
 
       if (response.ok && result.success) {
-        if (successMsg) successMsg.style.display = "block";
+        if (successMsg) successMsg.style.display = "flex";
         form.reset();
       } else {
         const errMsg = result.message || "Failed to deliver message via Web3Forms.";
@@ -1098,7 +1098,7 @@ function initHomepageForm() {
       const result = await response.json().catch(() => ({}));
 
       if (response.ok && result.success) {
-        if (successMsg) successMsg.style.display = "block";
+        if (successMsg) successMsg.style.display = "flex";
         form.reset();
         if (messageInput) messageInput.value = "";
       } else {

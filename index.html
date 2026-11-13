@@ -5,28 +5,30 @@
   <meta charset="UTF-8" />
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <title>Mohamed Amine Ben Masseoud — Web Developer &amp; CS Student | BMS Creations</title>
+  <title>Mohamed Amine Ben Masseoud · Web Developer &amp; CS Student | BMS Creations</title>
   <meta name="description"
-    content="Portfolio of Mohamed Amine Ben Masseoud (BMS Creations) — Web developer and Computer Science student at ISET Djerba building interactive systems, web applications, and intelligent platforms." />
+    content="Official portfolio of Mohamed Amine Ben Masseoud (BMS Creations). Computer Science student at ISET Djerba building web applications, interactive 3D systems, and cybersecurity labs." />
   <link rel="canonical" href="https://mohamedaminebenmasseoud.github.io/BMS-Creations/" />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://mohamedaminebenmasseoud.github.io/BMS-Creations/" />
-  <meta property="og:title" content="Mohamed Amine Ben Masseoud — Web Developer &amp; CS Student | BMS Creations" />
+  <meta property="og:title" content="Mohamed Amine Ben Masseoud · Web Developer &amp; CS Student | BMS Creations" />
   <meta property="og:description"
-    content="Portfolio of Mohamed Amine Ben Masseoud (BMS Creations) — Web developer and Computer Science student at ISET Djerba building interactive systems, web applications, and intelligent platforms." />
+    content="Official portfolio of Mohamed Amine Ben Masseoud (BMS Creations). Computer Science student at ISET Djerba building web applications, interactive 3D systems, and cybersecurity labs." />
   <meta property="og:image"
-    content="https://mohamedaminebenmasseoud.github.io/BMS-Creations/assets/images/og-image.png" />
+    content="https://mohamedaminebenmasseoud.github.io/BMS-Creations/assets/images/og-image.png?v=2" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:url" content="https://mohamedaminebenmasseoud.github.io/BMS-Creations/" />
-  <meta name="twitter:title" content="Mohamed Amine Ben Masseoud — Web Developer &amp; CS Student | BMS Creations" />
+  <meta name="twitter:title" content="Mohamed Amine Ben Masseoud · Web Developer &amp; CS Student | BMS Creations" />
   <meta name="twitter:description"
-    content="Portfolio of Mohamed Amine Ben Masseoud (BMS Creations) — Web developer and Computer Science student at ISET Djerba building interactive systems, web applications, and intelligent platforms." />
+    content="Official portfolio of Mohamed Amine Ben Masseoud (BMS Creations). Computer Science student at ISET Djerba building web applications, interactive 3D systems, and cybersecurity labs." />
   <meta name="twitter:image"
-    content="https://mohamedaminebenmasseoud.github.io/BMS-Creations/assets/images/og-image.png" />
+    content="https://mohamedaminebenmasseoud.github.io/BMS-Creations/assets/images/og-image.png?v=2" />
 
   <!-- Favicons & Manifest -->
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -537,8 +539,16 @@
                   <span class="button__inner" id="sub-btn-text" data-i18n="contact.homeConnectBtn">connect</span>
                 </button>
               </div>
-              <div class="subscribeForm__success" id="sub-success" data-i18n="contact.homeSuccessMsg">
-                Thank you! Message received — I'll reply promptly.
+              <div class="subscribeForm__success form-alert form-alert--success" id="sub-success" role="status" aria-live="polite">
+                <div class="form-alert__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 6L9 17l-5-5"></path>
+                  </svg>
+                </div>
+                <div class="form-alert__body">
+                  <strong class="form-alert__title" data-i18n="contact.successTitle">Got your message, thank you!</strong>
+                  <p class="form-alert__text" data-i18n="contact.homeSuccessMsg">Got it! Thanks for reaching out. I'll reply to your inbox soon.</p>
+                </div>
               </div>
               <div class="subscribeForm__error" id="sub-error"></div>
             </form>
