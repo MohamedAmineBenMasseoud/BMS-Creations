@@ -35,8 +35,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="../../assets/icons/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="../../assets/icons/apple-touch-icon.png" />
-  <link rel="manifest" href="../../site.webmanifest" />
-  <meta name="theme-color" content="#0d0f17" />
+  <meta name="theme-color" content="#eceae4" />
 
   <!-- Google Fonts: Preconnect & Optimized Display Swap -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -59,7 +58,7 @@
         bms.creations <span class="dot"></span>
       </a>
 
-      <div class="nav__links rf-links">
+      <div class="nav__links rf-links" id="nav-links">
         <a href="../../index.html" class="link nav__link rf-link underLink" data-content="home">
           <span data-i18n="nav.home">home</span>
         </a>
@@ -88,12 +87,16 @@
         <a href="../../contact.html" class="button button--nav button--black">
           <span class="button__inner" data-i18n="nav.hireMe">hire me</span>
         </a>
-      </div>
+                <button class="nav__toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" data-i18n-aria="nav.toggleMenu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
     </div>
   </nav>
 
   <!-- ═══ Main Content ═══ -->
   <main id="main-content">
+    <div class="scroll-progress-bar" id="scroll-progress"></div>
 
     <!-- ═══ Project Hero ═══ -->
     <section class="project-hero">
@@ -150,6 +153,14 @@
               <div class="project-video-frame" id="project-video"></div>
             </div>
 
+            <!-- Featured Visual Preview -->
+            <div class="project-featured-preview" id="project-featured-preview">
+              <picture>
+                <source id="project-preview-source" srcset="" type="image/webp" />
+                <img id="project-preview-img" src="" alt="" width="1340" height="900" loading="eager" decoding="async" />
+              </picture>
+            </div>
+
             <h2 data-i18n="detail.overview">Overview</h2>
             <p id="project-description"></p>
 
@@ -173,12 +184,8 @@
             <div class="sidebar-card glass">
               <h3 class="sidebar-card__title" data-i18n="detail.projectInfo">Project Info</h3>
               <div class="sidebar-card__item">
-                <span class="sidebar-card__item-label" data-i18n="detail.role">Role</span>
-                <span class="sidebar-card__item-value" id="project-role"></span>
-              </div>
-              <div class="sidebar-card__item">
-                <span class="sidebar-card__item-label" data-i18n="detail.duration">Duration</span>
-                <span class="sidebar-card__item-value" id="project-duration"></span>
+                <span class="sidebar-card__item-label" data-i18n="detail.type">Type</span>
+                <span class="sidebar-card__item-value" id="project-type-value"></span>
               </div>
               <div class="sidebar-card__item">
                 <span class="sidebar-card__item-label" data-i18n="detail.date">Date</span>
@@ -187,6 +194,26 @@
               <div class="sidebar-card__item">
                 <span class="sidebar-card__item-label" data-i18n="detail.category">Category</span>
                 <span class="sidebar-card__item-value" id="project-cat-value"></span>
+              </div>
+              <div class="sidebar-card__item" id="project-role-item" style="display: none;">
+                <span class="sidebar-card__item-label" data-i18n="detail.role">Role</span>
+                <span class="sidebar-card__item-value" id="project-role"></span>
+              </div>
+              <div class="sidebar-card__item" id="project-duration-item" style="display: none;">
+                <span class="sidebar-card__item-label" data-i18n="detail.duration">Duration</span>
+                <span class="sidebar-card__item-value" id="project-duration"></span>
+              </div>
+
+              <div class="sidebar-card__stack">
+                <h4 class="sidebar-card__stack-title" data-i18n="detail.technologies">Technologies</h4>
+                <div class="sidebar-card__tags" id="project-sidebar-tags"></div>
+              </div>
+
+              <div class="sidebar-card__links">
+                <a href="#" class="btn btn--primary btn--full" id="sidebar-live-link" target="_blank" rel="noopener noreferrer"
+                  data-i18n="detail.liveDemo">Live Demo</a>
+                <a href="#" class="btn btn--outline btn--full" id="sidebar-repo-link" target="_blank" rel="noopener noreferrer"
+                  data-i18n="detail.sourceCode">Source Code</a>
               </div>
             </div>
           </aside>
@@ -259,11 +286,11 @@
       </div>
 
       <div class="footer__right">
-        <div class="footer__label">Phone / WhatsApp:</div>
+        <div class="footer__label" data-i18n="footer.phoneLabel">Phone / WhatsApp:</div>
         <a href="tel:+21650405554" class="button button--white footer__link">
           <span class="button__inner">+216 50 405 554</span>
         </a>
-        <div class="footer__label">Direct Contact:</div>
+        <div class="footer__label" data-i18n="footer.contactLabel">Direct Contact:</div>
         <a href="mailto:mohamedaminebenmasseoud63@gmail.com" class="button button--white footer__link maintainWidth"
           data-copy-link="mohamedaminebenmasseoud63@gmail.com" data-content="mohamedaminebenmasseoud63@gmail.com">
           <span class="button__inner linkLabel"
@@ -274,7 +301,13 @@
   </footer>
 
   <!-- ═══ Back to Top Button ═══ -->
-  <button class="scroll-top-btn" id="scroll-top" aria-label="Scroll to top" title="Scroll to top">↑</button>
+    <!-- ═══ Back to Top Button ═══ -->
+  <button class="scroll-top-btn" id="scroll-top" aria-label="Scroll to top" data-i18n-aria="footer.backToTop">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
 
   <script src="../../data/i18n.js" defer></script>
   <script src="../../data/projects.js" defer></script>

@@ -1,6 +1,10 @@
 {
   "name": "BMS Creations — Mohamed Amine Ben Masseoud",
   "short_name": "BMS Creations",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#eceae4",
+  "background_color": "#eceae4",
   "icons": [
     {
       "src": "assets/icons/android-chrome-192x192.png",
@@ -12,9 +16,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "theme_color": "#0d0f17",
-  "background_color": "#0d0f17",
-  "display": "standalone"
+  ]
 }
-

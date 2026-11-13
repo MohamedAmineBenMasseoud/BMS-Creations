@@ -3,20 +3,33 @@
    ═══════════════════════════════════════════════ */
 
 document.addEventListener("DOMContentLoaded", () => {
+  initManifest();
   initI18n();
   initSmoothScroll();
   initScrollReveal();
   initPreloader();
   initNavigation();
   initStickyFeatures();
-  initSliders();
-  initOrbitCardStack();
+  initFlipStack();
   initCopyLinks();
   initFlippingWordSwap();
   initPageTransition();
   initContactForm();
   initHomepageForm();
 });
+
+/* ── Dynamic Manifest Injection for HTTP/HTTPS (Avoids file:// CORS error) ── */
+function initManifest() {
+  if (typeof window === "undefined" || !window.location) return;
+  if (window.location.protocol.startsWith("http") && !document.querySelector('link[rel="manifest"]')) {
+    const mainScript = document.querySelector('script[src*="main.js"]');
+    const prefix = mainScript && mainScript.getAttribute("src") && mainScript.getAttribute("src").startsWith("../../") ? "../../" : "";
+    const link = document.createElement("link");
+    link.rel = "manifest";
+    link.href = `${prefix}site.webmanifest`;
+    document.head.appendChild(link);
+  }
+}
 
 /* ── 0. Lightweight Internationalization (i18n) ── */
 function initI18n() {
@@ -180,6 +193,15 @@ function initScrollReveal() {
   const revealElements = document.querySelectorAll(".reveal");
   if (!revealElements.length) return;
 
+  // Immediate visibility check for elements already in or near viewport on load
+  const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+  revealElements.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < windowHeight + 40 && rect.bottom > 0) {
+      el.classList.add("visible");
+    }
+  });
+
   if ("IntersectionObserver" in window) {
     const observer = new IntersectionObserver(
       (entries, obs) => {
@@ -191,25 +213,29 @@ function initScrollReveal() {
         });
       },
       {
-        threshold: 0.1,
-        rootMargin: "0px 0px -40px 0px",
+        threshold: 0,
+        rootMargin: "0px 0px 80px 0px",
       }
     );
 
-    revealElements.forEach((el) => observer.observe(el));
+    revealElements.forEach((el) => {
+      if (!el.classList.contains("visible")) {
+        observer.observe(el);
+      }
+    });
   } else {
     // If IntersectionObserver is unavailable, immediately reveal all
     revealElements.forEach((el) => el.classList.add("visible"));
   }
 
-  // Safety fallback: reveal any remaining hidden elements after 2500ms
+  // Safety fallback: reveal any remaining hidden elements after 800ms
   setTimeout(() => {
     revealElements.forEach((el) => {
       if (!el.classList.contains("visible")) {
         el.classList.add("visible");
       }
     });
-  }, 2500);
+  }, 800);
 }
 
 /* ── 2. Preloader Lifecycle (First Visit Per Session Only) ── */
@@ -249,35 +275,63 @@ function initPreloader() {
 
 /* ── 3. Top Navigation & Mobile Menu ── */
 function initNavigation() {
-  const nav = document.getElementById("nav-bar") || document.getElementById("main-nav");
-  if (nav) {
-    const onScroll = () => {
-      if (window.scrollY > 40) {
-        nav.classList.add("scrolled");
-      } else {
-        nav.classList.remove("scrolled");
-      }
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-  }
-
-  // Mobile menu hamburger toggle
+  const mainNav = document.getElementById("main-nav");
+  const navBar = document.getElementById("nav-bar");
   const navToggle = document.getElementById("nav-toggle");
   const navLinks = document.getElementById("nav-links");
+
+  let openScrollY = 0;
+
+  const setMenuOpen = (open) => {
+    if (navToggle && navLinks) {
+      if (open) {
+        openScrollY = window.scrollY;
+      }
+      navToggle.classList.toggle("open", open);
+      navLinks.classList.toggle("open", open);
+      document.body.classList.toggle("nav-open", open);
+      navToggle.setAttribute("aria-expanded", String(open));
+    }
+  };
+
+  const onScroll = () => {
+    const scrollY = window.scrollY;
+    if (scrollY > 40) {
+      if (mainNav) mainNav.classList.add("scrolled");
+      if (navBar) navBar.classList.add("scrolled");
+    } else {
+      if (mainNav) mainNav.classList.remove("scrolled");
+      if (navBar) navBar.classList.remove("scrolled");
+    }
+
+    // Auto-close mobile menu if scrolled by more than 15px while open
+    if (navLinks && navLinks.classList.contains("open")) {
+      if (Math.abs(scrollY - openScrollY) > 15) {
+        setMenuOpen(false);
+      }
+    }
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  // Mobile menu hamburger toggle
   if (navToggle && navLinks) {
     navToggle.addEventListener("click", () => {
-      navToggle.classList.toggle("open");
-      navLinks.classList.toggle("open");
-      document.body.classList.toggle("nav-open");
+      const isOpen = navToggle.classList.contains("open");
+      setMenuOpen(!isOpen);
     });
 
     navLinks.querySelectorAll("a").forEach((link) => {
       link.addEventListener("click", () => {
-        navToggle.classList.remove("open");
-        navLinks.classList.remove("open");
-        document.body.classList.remove("nav-open");
+        setMenuOpen(false);
       });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && navToggle.classList.contains("open")) {
+        setMenuOpen(false);
+      }
     });
   }
 }
@@ -308,21 +362,35 @@ function initStickyFeatures() {
     });
   }
 
+  let isScrollingFromClick = false;
+  let scrollTimeout = null;
+
   // Click tab to scroll smoothly to section
   headings.forEach((heading) => {
     heading.addEventListener("click", () => {
       const targetId = heading.getAttribute("data-target");
       const targetEl = document.getElementById(targetId);
       if (targetEl) {
-        const headerOffset = 145;
+        const navBar = document.getElementById("main-nav");
+        const navHeight = navBar ? navBar.offsetHeight : 78;
+        const barHeight = stickyBar.offsetHeight || 60;
+        const headerOffset = navHeight + barHeight + 10;
         const elementPosition = targetEl.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+        isScrollingFromClick = true;
+        clearTimeout(scrollTimeout);
+        setActiveSection(targetId);
 
         window.scrollTo({
           top: offsetPosition,
           behavior: "smooth",
         });
-        setActiveSection(targetId);
+
+        scrollTimeout = setTimeout(() => {
+          isScrollingFromClick = false;
+          updateScrollSpy();
+        }, 800);
       }
     });
   });
@@ -336,75 +404,25 @@ function initStickyFeatures() {
 
   if (!sections.length) return;
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
-        }
-      });
-    },
-    {
-      rootMargin: "-20% 0px -50% 0px",
-      threshold: 0.1,
+  const updateScrollSpy = () => {
+    if (isScrollingFromClick) return;
+    const navBar = document.getElementById("main-nav");
+    const navHeight = navBar ? navBar.offsetHeight : 78;
+    const barHeight = stickyBar.offsetHeight || 60;
+    const scrollPos = window.scrollY + navHeight + barHeight + 50;
+
+    let currentSectionId = sections[0].id;
+    for (let i = 0; i < sections.length; i++) {
+      const sec = sections[i];
+      if (sec.offsetTop <= scrollPos) {
+        currentSectionId = sec.id;
+      }
     }
-  );
+    setActiveSection(currentSectionId);
+  };
 
-  sections.forEach((sec) => observer.observe(sec));
-}
-
-/* ── 5. Horizontal Sliders (Drag & Button Nav) ── */
-function initSliders() {
-  const galleryInner = document.getElementById("gallery-slider-inner");
-  const btnPrev = document.getElementById("gallery-prev");
-  const btnNext = document.getElementById("gallery-next");
-
-  if (galleryInner) {
-    if (btnPrev) {
-      btnPrev.addEventListener("click", () => {
-        galleryInner.scrollBy({ left: -420, behavior: "smooth" });
-      });
-    }
-    if (btnNext) {
-      btnNext.addEventListener("click", () => {
-        galleryInner.scrollBy({ left: 420, behavior: "smooth" });
-      });
-    }
-
-    // Enable mouse drag on slider
-    enableDragScroll(galleryInner);
-  }
-
-  function enableDragScroll(slider) {
-    let isDown = false;
-    let startX = 0;
-    let scrollLeft = 0;
-
-    slider.addEventListener("mousedown", (e) => {
-      isDown = true;
-      slider.style.cursor = "grabbing";
-      startX = e.pageX - slider.offsetLeft;
-      scrollLeft = slider.scrollLeft;
-    });
-
-    slider.addEventListener("mouseleave", () => {
-      isDown = false;
-      slider.style.cursor = "grab";
-    });
-
-    slider.addEventListener("mouseup", () => {
-      isDown = false;
-      slider.style.cursor = "grab";
-    });
-
-    slider.addEventListener("mousemove", (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - slider.offsetLeft;
-      const walk = (x - startX) * 1.6;
-      slider.scrollLeft = scrollLeft - walk;
-    });
-  }
+  window.addEventListener("scroll", updateScrollSpy, { passive: true });
+  updateScrollSpy();
 }
 
 /* ── Helpers for Dynamic Components ── */
@@ -427,350 +445,279 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
-/* ── 6. Orbit Card Stack Controller (Dynamic from data/projects.js) ── */
-function initOrbitCardStack() {
-  const stack = document.getElementById("orbit-stack");
-  if (!stack) return;
+/* ── 6. Case Study Flip Stack Controller (Componentry Scroll-Driven Stack) ── */
+function initFlipStack() {
+  const container = document.getElementById("flip-stack-container");
+  const stage = document.getElementById("flip-stack-stage");
+  const deck = document.getElementById("flip-deck");
+  if (!container || !deck) return;
 
-  // Render cards & dots dynamically from PROJECTS array if available
-  if (typeof PROJECTS !== "undefined" && Array.isArray(PROJECTS) && PROJECTS.length > 0) {
-    // Sort so featured projects appear first
-    const displayProjects = [...PROJECTS].sort(
-      (a, b) => (b.featured === true ? 1 : 0) - (a.featured === true ? 1 : 0)
-    );
+  // Use PROJECTS from data/projects.js
+  const projects = (typeof PROJECTS !== "undefined" && Array.isArray(PROJECTS) && PROJECTS.length > 0)
+    ? [...PROJECTS].sort((a, b) => (b.featured === true ? 1 : 0) - (a.featured === true ? 1 : 0))
+    : [];
 
-    stack.innerHTML = displayProjects.map((p, index) => {
-      const avatar =
-        p.avatar ||
-        p.title
-          .replace(/[^A-Za-z0-9 ]/g, "")
-          .trim()
-          .split(/\s+/)
-          .map((w) => w[0])
-          .join("")
-          .slice(0, 2)
-          .toUpperCase();
-      const statCategory =
-        p.statCategory ||
-        (p.category === "interactive"
-          ? "Interactive"
-          : "Web");
-      const miniDesc = p.miniDesc || p.description;
-      const tag =
-        p.cardTag ||
-        (p.tags && p.tags.length ? p.tags.slice(0, 2).join(" · ") : "Featured");
-      const accent = p.accent || "#6756bd";
-      const glow = hexToRgba(accent, 0.4);
-      const year = p.date ? p.date.slice(0, 4) : "2026";
-      const roleText = `${p.subtitle || p.category} · ${year}`;
-      const detailUrl = `projects/${p.id}/index.html`;
-      const isActive = index === 0;
+  if (!projects.length) return;
 
-      return `
-        <div class="orbit-card${isActive ? " active" : ""}" data-index="${index}" data-diff="${index}" data-name="${escapeHtml(p.title)}"
-          data-role="${escapeHtml(roleText)}"
-          data-desc="${escapeHtml(p.description)}"
-          data-url="${escapeHtml(p.liveUrl)}"
-          data-detail="${detailUrl}" data-accent="${accent}"
-          tabindex="0"
-          role="group"
-          aria-roledescription="slide"
-          aria-label="${escapeHtml(p.title)} (${index + 1} of ${displayProjects.length})"
-          style="--card-accent: ${accent}; --card-accent-glow: ${glow};">
-          <div class="orbit-card__inner">
-            <div class="orbit-card__top">
-              <div class="orbit-card__avatar">${escapeHtml(avatar)}</div>
-              <div class="orbit-card__stat">
-                <span class="dot"></span>
-                <span>${escapeHtml(statCategory)}</span>
-              </div>
-            </div>
-            <div class="orbit-card__image">
-              <picture>
-                <source srcset="${escapeHtml(encodeURI(p.thumbnail || p.hero))}" type="image/webp" />
-                <img src="${escapeHtml(encodeURI(p.thumbnail || p.hero))}" alt="${escapeHtml(p.title)}" width="1340" height="900" loading="lazy" decoding="async" />
-              </picture>
-            </div>
-            <div class="orbit-card__body">
-              <h3 class="orbit-card__name">${escapeHtml(p.title)}</h3>
-              <p class="orbit-card__role">${escapeHtml(p.subtitle || p.category)}</p>
-              <p class="orbit-card__desc-mini">${escapeHtml(miniDesc)}</p>
-            </div>
-            <div class="orbit-card__bottom">
-              <span class="orbit-card__tag">${escapeHtml(tag)}</span>
-              <span class="orbit-card__arrow">↗</span>
-            </div>
+  const total = projects.length;
+
+  const currentLang =
+    (typeof window.bmsGetLanguage === "function"
+      ? window.bmsGetLanguage()
+      : document.documentElement.lang) || "en";
+
+  // Render cards into deck
+  deck.innerHTML = projects.map((raw, index) => {
+    const p =
+      typeof window.bmsLocalizeProject === "function"
+        ? window.bmsLocalizeProject(raw, currentLang)
+        : currentLang === "fr" && raw.fr
+        ? { ...raw, ...raw.fr }
+        : raw;
+
+    const eyebrow = p.eyebrow || `${p.subtitle || p.category} · ${p.date ? p.date.slice(0, 4) : "2026"}`;
+    const title = p.title || "Project";
+    const desc = p.description || p.miniDesc || "";
+    const img = p.image || p.thumbnail || p.hero || "";
+    const imgAlt = p.imageAlt || `${title} screenshot`;
+    const bg = p.background || p.accent || "#121316";
+    const fg = p.foreground || "#ffffff";
+    const tags = p.tags && Array.isArray(p.tags) ? p.tags.slice(0, 4) : [];
+    const liveUrl = p.liveUrl || "";
+    const detailUrl = `projects/${p.id}/index.html`;
+    const repoUrl = p.repoUrl || "";
+
+    return `
+      <article class="flip-card" id="flip-card-${index}" data-index="${index}"
+        style="--card-bg: ${bg}; --card-fg: ${fg};"
+        role="group"
+        aria-roledescription="slide"
+        aria-label="${escapeHtml(title)} (${index + 1} of ${total})">
+        <div class="flip-card__content">
+          <div class="flip-card__eyebrow">
+            <span class="flip-card__eyebrow-dot" aria-hidden="true"></span>
+            <span>${escapeHtml(eyebrow)}</span>
+          </div>
+          <h3 class="flip-card__title">${escapeHtml(title)}</h3>
+          <p class="flip-card__desc">${escapeHtml(desc)}</p>
+          <div class="flip-card__tags">
+            ${tags.map((t) => `<span class="flip-card__tag">${escapeHtml(t)}</span>`).join("")}
+          </div>
+          <div class="flip-card__actions">
+            ${liveUrl && liveUrl !== "#" ? `
+              <a href="${escapeHtml(liveUrl)}" target="_blank" rel="noopener noreferrer" class="flip-btn flip-btn--primary">
+                <span data-i18n="hero.liveDemo">live demo ↗</span>
+              </a>
+            ` : ""}
+            <a href="${escapeHtml(detailUrl)}" class="flip-btn flip-btn--secondary">
+              <span data-i18n="hero.details">details →</span>
+            </a>
+            ${repoUrl && repoUrl !== "#" ? `
+              <a href="${escapeHtml(repoUrl)}" target="_blank" rel="noopener noreferrer" class="flip-btn flip-btn--ghost">
+                <span>code ↗</span>
+              </a>
+            ` : ""}
           </div>
         </div>
-      `.trim();
-    }).join("\n");
+        <div class="flip-card__media">
+          <picture>
+            <source srcset="${escapeHtml(encodeURI(img))}" type="image/webp" />
+            <img src="${escapeHtml(encodeURI(img))}" alt="${escapeHtml(imgAlt)}" class="flip-card__img" width="1340" height="900" loading="${index === 0 ? "eager" : "lazy"}" decoding="async" />
+          </picture>
+        </div>
+      </article>
+    `.trim();
+  }).join("\n");
 
-    const dotsContainer = document.getElementById("orbit-dots");
-    if (dotsContainer) {
-      dotsContainer.innerHTML = displayProjects.map((p, index) => {
-        const isActive = index === 0;
-        return `<button class="orbit-dot${isActive ? " active" : ""}" data-index="${index}" aria-label="Go to project ${index + 1}: ${escapeHtml(p.title)}"></button>`;
-      }).join("\n");
+  // Immediate and dynamic translation synchronization for rendered cards
+  const syncDynamicI18n = (lang) => {
+    if (typeof I18N === "undefined") return;
+    const targetLang = lang || (window.bmsGetLanguage ? window.bmsGetLanguage() : (document.documentElement.lang || "en"));
+    const dict = I18N[targetLang] || I18N.en;
+    if (!dict) return;
+    deck.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      const text = key.split(".").reduce((acc, part) => acc && acc[part], dict);
+      if (text !== undefined) el.textContent = text;
+    });
+
+    // Update localized card texts (eyebrow, desc, title)
+    deck.querySelectorAll(".flip-card").forEach((card) => {
+      const idx = parseInt(card.getAttribute("data-index"), 10);
+      const raw = projects[idx];
+      if (!raw) return;
+      const lp =
+        typeof window.bmsLocalizeProject === "function"
+          ? window.bmsLocalizeProject(raw, targetLang)
+          : targetLang === "fr" && raw.fr
+          ? { ...raw, ...raw.fr }
+          : raw;
+
+      const eyebrowSpan = card.querySelector(".flip-card__eyebrow span:last-child");
+      if (eyebrowSpan) {
+        eyebrowSpan.textContent =
+          lp.eyebrow || `${lp.subtitle || lp.category} · ${lp.date ? lp.date.slice(0, 4) : "2026"}`;
+      }
+      const descEl = card.querySelector(".flip-card__desc");
+      if (descEl) descEl.textContent = lp.description || lp.miniDesc || raw.description;
+      const titleEl = card.querySelector(".flip-card__title");
+      if (titleEl) titleEl.textContent = lp.title || raw.title;
+    });
+  };
+  syncDynamicI18n(currentLang);
+  window.addEventListener("bms:langchange", (e) => {
+    const lang = (e.detail && e.detail.lang) || (window.bmsGetLanguage ? window.bmsGetLanguage() : "en");
+    syncDynamicI18n(lang);
+  });
+
+  const cards = Array.from(deck.querySelectorAll(".flip-card"));
+  const progressBar = document.getElementById("flip-progress-bar");
+
+  let currentActiveIndex = 0;
+  let isTicking = false;
+
+  function updateFlipCards() {
+    isTicking = false;
+    const rect = container.getBoundingClientRect();
+    const containerH = container.offsetHeight;
+    const winH = window.innerHeight;
+    const stickyTop = window.innerWidth <= 768 ? 108 : (window.innerWidth <= 992 ? 130 : 145);
+    const scrollableDistance = containerH - (winH - stickyTop);
+
+    if (scrollableDistance <= 0) return;
+
+    // Normalized progress through the sticky track: 0 at start, 1 when all cards flipped
+    const rawProgress = (stickyTop - rect.top) / scrollableDistance;
+    const progress = Math.max(0, Math.min(1, rawProgress));
+
+    // Floating card index: 0.0 to (total - 1)
+    const curFloat = progress * (total - 1);
+    const activeIndex = Math.min(Math.round(curFloat), total - 1);
+
+    if (activeIndex !== currentActiveIndex) {
+      currentActiveIndex = activeIndex;
     }
-  }
 
-  const cards = Array.from(stack.querySelectorAll(".orbit-card"));
-  const titleEl = document.getElementById("orbit-title");
-  const roleEl = document.getElementById("orbit-role");
-  const descEl = document.getElementById("orbit-desc");
-  const linkEl = document.getElementById("orbit-link");
-  const detailEl = document.getElementById("orbit-detail-link");
-  const stageWrapper = stack.closest(".orbit-stage-wrapper") || stack;
-  const btnPrev = document.getElementById("orbit-prev");
-  const btnNext = document.getElementById("orbit-next");
-  const dots = Array.from(document.querySelectorAll(".orbit-dot"));
-
-  if (!cards.length) return;
-
-  let activeIndex = cards.findIndex((c) => c.classList.contains("active"));
-  if (activeIndex === -1) activeIndex = 0;
-  let currentlyDisplayedIndex = -1;
-
-  function updateViewingHeader(card) {
-    if (!card) return;
-    const name = card.getAttribute("data-name") || "";
-    const role = card.getAttribute("data-role") || "";
-    const desc = card.getAttribute("data-desc") || "";
-    const url = card.getAttribute("data-url") || "#";
-    const detailUrl = card.getAttribute("data-detail") || "#";
-
-    if (linkEl) linkEl.setAttribute("href", url);
-    if (detailEl) detailEl.setAttribute("href", detailUrl);
-
-    if (titleEl) {
-      titleEl.style.opacity = "0";
-      titleEl.style.transform = "translateY(5px)";
+    if (progressBar) {
+      progressBar.style.width = `${(progress * 100).toFixed(1)}%`;
     }
-    if (roleEl) roleEl.style.opacity = "0";
-    if (descEl) descEl.style.opacity = "0";
 
-    setTimeout(() => {
-      if (titleEl) {
-        titleEl.textContent = name;
-        titleEl.style.opacity = "1";
-        titleEl.style.transform = "translateY(0)";
-      }
-      if (roleEl) {
-        roleEl.textContent = role;
-        roleEl.style.opacity = "1";
-      }
-      if (descEl) {
-        descEl.textContent = desc;
-        descEl.style.opacity = "1";
-      }
-    }, 120);
-  }
-
-  function setActiveCard(index, lift = false) {
-    const isDifferent = currentlyDisplayedIndex !== index;
-    activeIndex = (index + cards.length) % cards.length;
-    currentlyDisplayedIndex = activeIndex;
-
-    const n = cards.length;
+    // Apply 3D flip physics to each card
     cards.forEach((card, i) => {
-      let diff = (i - activeIndex) % n;
-      if (diff > n / 2) diff -= n;
-      if (diff < -n / 2) diff += n;
+      const diff = curFloat - i;
 
-      card.style.setProperty("--diff", diff);
-      card.setAttribute("data-diff", String(diff));
+      if (diff > 0) {
+        // Card has folded or is currently folding away upward
+        const foldProgress = Math.min(1, diff);
+        const rotateX = foldProgress * 42; // degrees
+        const translateY = -(foldProgress * 115); // percent
+        const scale = 1 - foldProgress * 0.08;
+        const opacity = Math.max(0, 1 - foldProgress * 1.5);
+        const pointerEvents = foldProgress > 0.4 ? "none" : "auto";
+        const zIndex = 50 - i;
 
-      const isTarget = diff === 0;
-      card.classList.toggle("active", isTarget);
-      card.classList.toggle("is-lifted", isTarget && lift);
-      card.setAttribute("aria-hidden", isTarget ? "false" : "true");
-    });
-
-    dots.forEach((dot, i) => {
-      dot.classList.toggle("active", i === activeIndex);
-    });
-
-    if (isDifferent && cards[activeIndex]) {
-      updateViewingHeader(cards[activeIndex]);
-    }
-  }
-
-  // Card events (hover & click)
-  cards.forEach((card, index) => {
-    const onCardHover = () => {
-      if (window.innerWidth > 768) {
-        stageWrapper.classList.add("is-fanned");
-        setActiveCard(index, true);
-      }
-    };
-
-    card.addEventListener("mouseenter", onCardHover);
-    card.addEventListener("focus", onCardHover);
-
-    card.addEventListener("click", (e) => {
-      const diff = parseInt(card.getAttribute("data-diff"), 10);
-      const url = card.getAttribute("data-url");
-      const isArrow = e.target.closest(".orbit-card__arrow") || e.target.closest(".orbit-card__bottom");
-
-      // Clicking peeking card on mobile navigates to it
-      if (diff !== 0) {
-        e.preventDefault();
-        setActiveCard(index, true);
-        return;
-      }
-
-      if (isArrow) {
-        if (url && url !== "#") window.open(url, "_blank", "noopener,noreferrer");
-        return;
-      }
-
-      if (window.innerWidth <= 768) {
-        if (url && url !== "#") window.open(url, "_blank", "noopener,noreferrer");
+        card.style.setProperty("--flip-rotate", `${rotateX.toFixed(2)}deg`);
+        card.style.setProperty("--flip-y", `${translateY.toFixed(2)}%`);
+        card.style.setProperty("--flip-scale", scale.toFixed(3));
+        card.style.setProperty("--flip-opacity", opacity.toFixed(3));
+        card.style.setProperty("--flip-z", String(zIndex));
+        card.style.setProperty("--flip-pointer", pointerEvents);
+        card.setAttribute("aria-hidden", foldProgress > 0.5 ? "true" : "false");
       } else {
-        if (
-          activeIndex === index &&
-          stageWrapper.classList.contains("is-fanned") &&
-          card.classList.contains("is-lifted")
-        ) {
-          if (url && url !== "#") window.open(url, "_blank", "noopener,noreferrer");
-        } else {
-          stageWrapper.classList.add("is-fanned");
-          setActiveCard(index, true);
-        }
+        // Card is active or waiting beneath in the deck
+        const under = -diff; // 0 for exact active, positive for cards underneath
+        const translateY = Math.min(under * 14, 42); // px
+        const scale = Math.max(0.92, 1 - under * 0.035);
+        const opacity = under < 2.5 ? 1 : 0;
+        const pointerEvents = under < 0.3 ? "auto" : "none";
+        const zIndex = 50 - i;
+
+        card.style.setProperty("--flip-rotate", "0deg");
+        card.style.setProperty("--flip-y", `${translateY.toFixed(1)}px`);
+        card.style.setProperty("--flip-scale", scale.toFixed(3));
+        card.style.setProperty("--flip-opacity", opacity.toFixed(2));
+        card.style.setProperty("--flip-z", String(zIndex));
+        card.style.setProperty("--flip-pointer", pointerEvents);
+        card.setAttribute("aria-hidden", under > 0.5 ? "true" : "false");
       }
-    });
-  });
-
-  // Stage wrapper hover on desktop
-  stageWrapper.addEventListener("mouseenter", () => {
-    if (window.innerWidth > 768) {
-      stageWrapper.classList.add("is-fanned");
-    }
-  });
-
-  stageWrapper.addEventListener("mouseleave", () => {
-    if (window.innerWidth > 768) {
-      stageWrapper.classList.remove("is-fanned");
-      cards.forEach((card, i) => {
-        card.classList.remove("is-lifted");
-      });
-    }
-  });
-
-  // Controls: Prev & Next buttons
-  if (btnPrev) {
-    btnPrev.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (window.innerWidth > 768) stageWrapper.classList.add("is-fanned");
-      setActiveCard(activeIndex - 1, true);
     });
   }
 
-  if (btnNext) {
-    btnNext.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (window.innerWidth > 768) stageWrapper.classList.add("is-fanned");
-      setActiveCard(activeIndex + 1, true);
+  function requestUpdate() {
+    if (!isTicking) {
+      window.requestAnimationFrame(updateFlipCards);
+      isTicking = true;
+    }
+  }
+
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate, { passive: true });
+
+  // Navigation scroll jump helper
+  function scrollToCard(index) {
+    const targetIdx = Math.max(0, Math.min(total - 1, index));
+    const stickyTop = window.innerWidth <= 768 ? 108 : (window.innerWidth <= 992 ? 130 : 145);
+    const containerTop = container.getBoundingClientRect().top + window.pageYOffset;
+    const containerH = container.offsetHeight;
+    const scrollableDistance = containerH - (window.innerHeight - stickyTop);
+    const targetScrollY = containerTop - stickyTop + (targetIdx / (total - 1)) * scrollableDistance;
+
+    window.scrollTo({
+      top: targetScrollY,
+      behavior: "smooth",
     });
   }
 
-  // Dots navigation
-  dots.forEach((dot) => {
-    dot.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const idx = parseInt(dot.getAttribute("data-index"), 10);
-      if (!isNaN(idx)) {
-        if (window.innerWidth > 768) stageWrapper.classList.add("is-fanned");
-        setActiveCard(idx, true);
-      }
-    });
-  });
-
-  // ── Touch Swipe Gestures for Mobile & Touch Devices ──
-  let touchStartX = 0;
+  // Touch Swipe Gesture for mobile
   let touchStartY = 0;
-  let touchDeltaX = 0;
-  let isSwiping = false;
+  let touchStartX = 0;
 
-  stageWrapper.addEventListener(
+  stage.addEventListener(
     "touchstart",
     (e) => {
-      if (!e.touches || !e.touches[0]) return;
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      touchDeltaX = 0;
-      isSwiping = false;
+      if (e.touches && e.touches[0]) {
+        touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+      }
     },
     { passive: true }
   );
 
-  stageWrapper.addEventListener(
-    "touchmove",
+  stage.addEventListener(
+    "touchend",
     (e) => {
-      if (!e.touches || !e.touches[0]) return;
-      touchDeltaX = e.touches[0].clientX - touchStartX;
-      const deltaY = e.touches[0].clientY - touchStartY;
+      if (!e.changedTouches || !e.changedTouches[0]) return;
+      const deltaY = e.changedTouches[0].clientY - touchStartY;
+      const deltaX = e.changedTouches[0].clientX - touchStartX;
 
-      if (Math.abs(touchDeltaX) > Math.abs(deltaY) && Math.abs(touchDeltaX) > 10) {
-        isSwiping = true;
+      // Vertical swipe intent
+      if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 40) {
+        if (deltaY < 0) {
+          // Swiped up -> next
+          scrollToCard(currentActiveIndex + 1);
+        } else {
+          // Swiped down -> prev
+          scrollToCard(currentActiveIndex - 1);
+        }
       }
     },
     { passive: true }
   );
 
-  stageWrapper.addEventListener("touchend", () => {
-    if (isSwiping) {
-      const threshold = 40;
-      if (touchDeltaX < -threshold) {
-        setActiveCard(activeIndex + 1, true);
-      } else if (touchDeltaX > threshold) {
-        setActiveCard(activeIndex - 1, true);
-      }
-    }
-    isSwiping = false;
-    touchDeltaX = 0;
-  });
-
-  // Keyboard Accessibility (Arrow keys & Enter/Space)
-  stageWrapper.setAttribute("role", "region");
-  stageWrapper.setAttribute("aria-roledescription", "carousel");
-  stageWrapper.setAttribute("aria-label", "Featured Projects Carousel");
-
-  stageWrapper.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+  // Keyboard accessibility
+  stage.setAttribute("tabindex", "0");
+  stage.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowRight") {
       e.preventDefault();
-      if (window.innerWidth > 768) stageWrapper.classList.add("is-fanned");
-      setActiveCard(activeIndex - 1, true);
-      if (cards[activeIndex]) cards[activeIndex].focus();
-    } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      scrollToCard(currentActiveIndex + 1);
+    } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
       e.preventDefault();
-      if (window.innerWidth > 768) stageWrapper.classList.add("is-fanned");
-      setActiveCard(activeIndex + 1, true);
-      if (cards[activeIndex]) cards[activeIndex].focus();
-    } else if (e.key === "Enter" || e.key === " ") {
-      if (document.activeElement && document.activeElement.classList.contains("orbit-card")) {
-        e.preventDefault();
-        const url = document.activeElement.getAttribute("data-url");
-        if (url && url !== "#") window.open(url, "_blank", "noopener,noreferrer");
-      }
+      scrollToCard(currentActiveIndex - 1);
     }
   });
 
-  stageWrapper.addEventListener("focusin", () => {
-    if (window.innerWidth > 768) stageWrapper.classList.add("is-fanned");
-  });
-
-  stageWrapper.addEventListener("focusout", (e) => {
-    if (window.innerWidth > 768 && !stageWrapper.contains(e.relatedTarget)) {
-      stageWrapper.classList.remove("is-fanned");
-      cards.forEach((card, i) => {
-        card.classList.remove("is-lifted");
-      });
-    }
-  });
-
-  // Initial state setup
-  setActiveCard(activeIndex, false);
+  // Initial calculation
+  updateFlipCards();
 }
 
 /* ── 7. Copy-To-Clipboard Buttons ── */
@@ -813,17 +760,20 @@ function initFlippingWordSwap() {
 
   let currentIndex = 0;
 
-  function updateWidth(idx) {
-    const el = words[idx];
-    if (el) {
-      container.style.width = `${el.offsetWidth + 2}px`;
+  function lockMaxWidth() {
+    const maxWidth = Math.max(...words.map((w) => w.scrollWidth || w.offsetWidth || 0));
+    if (maxWidth > 0) {
+      container.style.width = `${maxWidth + 4}px`;
     }
   }
 
-  updateWidth(0);
-  window.addEventListener("resize", () => updateWidth(currentIndex));
+  lockMaxWidth();
+  window.addEventListener("resize", lockMaxWidth);
+  window.addEventListener("bms:langchange", () => {
+    requestAnimationFrame(() => lockMaxWidth());
+  });
   if (document.fonts) {
-    document.fonts.ready.then(() => updateWidth(currentIndex));
+    document.fonts.ready.then(lockMaxWidth);
   }
 
   // Disable interval transitions if user prefers reduced motion
@@ -843,7 +793,6 @@ function initFlippingWordSwap() {
     nextWord.classList.add("active");
 
     currentIndex = nextIndex;
-    updateWidth(currentIndex);
 
     setTimeout(() => {
       currentWord.classList.remove("exit");
@@ -862,21 +811,42 @@ function initPageTransition() {
     return;
   }
 
-  window.addEventListener("load", () => {
+  const hideOverlay = () => {
     overlay.classList.remove("active");
-  });
+  };
 
-  document.querySelectorAll('a[href]:not([href^="#"]):not([target="_blank"])').forEach((link) => {
-    link.addEventListener("click", (e) => {
-      const href = link.getAttribute("href");
-      if (!href || href.startsWith("http") || href.startsWith("mailto:")) return;
+  window.addEventListener("load", hideOverlay);
+  window.addEventListener("pageshow", hideOverlay);
 
-      e.preventDefault();
-      overlay.classList.add("active");
-      setTimeout(() => {
-        window.location.href = href;
-      }, 350);
-    });
+  // Delegated click handler for all page navigation links
+  document.addEventListener("click", (e) => {
+    // Ignore clicks with modifier keys (new tab, new window, etc.)
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+    const link = e.target.closest("a[href]");
+    if (!link) return;
+
+    // Ignore external targets, downloads, or anchor hash links
+    if (link.target === "_blank" || link.hasAttribute("download")) return;
+
+    const href = link.getAttribute("href");
+    if (
+      !href ||
+      href.startsWith("#") ||
+      href.startsWith("mailto:") ||
+      href.startsWith("tel:") ||
+      href.startsWith("javascript:") ||
+      href.startsWith("http://") ||
+      href.startsWith("https://")
+    ) {
+      return;
+    }
+
+    e.preventDefault();
+    overlay.classList.add("active");
+    setTimeout(() => {
+      window.location.href = href;
+    }, 350);
   });
 }
 
@@ -957,12 +927,22 @@ function initContactForm() {
 
     if (!isValid) return;
 
+    const currentLang =
+      (typeof window.bmsGetLanguage === "function"
+        ? window.bmsGetLanguage()
+        : document.documentElement.lang) || "en";
+    const dict = typeof I18N !== "undefined" && I18N[currentLang] ? I18N[currentLang] : null;
+
     // 3. Set loading state
-    const originalBtnText = btnText ? btnText.textContent : "Send Message";
+    const originalBtnText =
+      btnText ? btnText.textContent : dict?.contact?.sendBtn || "Send Message";
+    const sendingText =
+      dict?.contact?.sendingBtn || (currentLang === "fr" ? "Envoi en cours..." : "Sending...");
+
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.style.opacity = "0.7";
-      if (btnText) btnText.textContent = "Sending...";
+      if (btnText) btnText.textContent = sendingText;
     }
 
     // 4. Submit via Web3Forms with placeholder access key
@@ -983,6 +963,12 @@ function initContactForm() {
     const mailtoBody = encodeURIComponent(`From: ${nameVal} (${emailVal})\n\nMessage:\n${messageVal}`);
     const mailtoUrl = `mailto:${recipientEmail}?subject=${mailtoSubject}&body=${mailtoBody}`;
 
+    const fallbackErrorText =
+      dict?.contact?.homeErrorMsg ||
+      (currentLang === "fr"
+        ? "Impossible d'envoyer le message. Écrivez-moi directement :"
+        : "Could not send message. Please email directly:");
+
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
@@ -1001,13 +987,13 @@ function initContactForm() {
       } else {
         const errMsg = result.message || "Failed to deliver message via Web3Forms.";
         if (errorMsg) {
-          errorMsg.innerHTML = `Could not send message (${errMsg}). <br/> Send directly via email instead: <a href="${mailtoUrl}" class="form-fallback-link">${recipientEmail}</a>`;
+          errorMsg.innerHTML = `${fallbackErrorText} (${errMsg}) <br/> <a href="${mailtoUrl}" class="form-fallback-link">${recipientEmail}</a>`;
           errorMsg.style.display = "block";
         }
       }
     } catch (err) {
       if (errorMsg) {
-        errorMsg.innerHTML = `Network error sending message. <br/> Send directly via email instead: <a href="${mailtoUrl}" class="form-fallback-link">${recipientEmail}</a>`;
+        errorMsg.innerHTML = `${fallbackErrorText} <br/> <a href="${mailtoUrl}" class="form-fallback-link">${recipientEmail}</a>`;
         errorMsg.style.display = "block";
       }
     } finally {

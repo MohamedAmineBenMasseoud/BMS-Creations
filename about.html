@@ -32,8 +32,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png" />
-  <link rel="manifest" href="site.webmanifest" />
-  <meta name="theme-color" content="#0d0f17" />
+  <meta name="theme-color" content="#eceae4" />
 
   <!-- Google Fonts: Preconnect & Optimized Display Swap -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -55,7 +54,7 @@
         bms.creations <span class="dot"></span>
       </a>
 
-      <div class="nav__links rf-links">
+      <div class="nav__links rf-links" id="nav-links">
         <a href="index.html" class="link nav__link rf-link underLink" data-content="home">
           <span data-i18n="nav.home">home</span>
         </a>
@@ -84,18 +83,22 @@
         <a href="contact.html" class="button button--nav button--black">
           <span class="button__inner" data-i18n="nav.hireMe">hire me</span>
         </a>
-      </div>
+                <button class="nav__toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" data-i18n-aria="nav.toggleMenu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
     </div>
   </nav>
 
   <!-- ═══ Main Content ═══ -->
   <main id="main-content">
+    <div class="scroll-progress-bar" id="scroll-progress"></div>
 
     <!-- ═══ About Hero ═══ -->
     <section class="hero hero--about" id="about-hero">
       <div class="hero__content">
         <span class="section__label section__label--fade-up" data-i18n="about.label">About Mohamed Amine</span>
-        <h1 class="hero__title hero__title--about">
+        <h1 class="hero__title hero__title--about" data-i18n="about.title">
           Engineering with discipline &amp; craft
         </h1>
         <p class="hero__subtitle" data-i18n="about.lead">
@@ -111,19 +114,19 @@
         <div class="stats-row">
           <div class="stat-card glass reveal">
             <p class="stat-card__number">5+</p>
-            <p class="stat-card__label">Flagship Projects</p>
+            <p class="stat-card__label" data-i18n="about.statProjects">Flagship Projects</p>
           </div>
           <div class="stat-card glass reveal">
             <p class="stat-card__number">10+</p>
-            <p class="stat-card__label">Technical Domains</p>
+            <p class="stat-card__label" data-i18n="about.statDomains">Technical Domains</p>
           </div>
           <div class="stat-card glass reveal">
             <p class="stat-card__number">45+</p>
-            <p class="stat-card__label">Skills &amp; Technologies</p>
+            <p class="stat-card__label" data-i18n="about.statSkills">Skills &amp; Technologies</p>
           </div>
           <div class="stat-card glass reveal">
             <p class="stat-card__number">3</p>
-            <p class="stat-card__label">Spoken Languages</p>
+            <p class="stat-card__label" data-i18n="about.statLanguages">Spoken Languages</p>
           </div>
         </div>
       </div>
@@ -151,9 +154,9 @@
                     <polyline points="8 6 2 12 8 18"></polyline>
                   </svg>
                 </div>
-                <h3 class="skill-category-title">Programming Languages</h3>
+                <h3 class="skill-category-title" data-i18n="about.catProgTitle">Programming Languages</h3>
               </div>
-              <span class="skill-category-badge">7 Languages</span>
+              <span class="skill-category-badge" data-i18n="about.catProgBadge">7 Languages</span>
             </div>
             <div class="skill-pills">
               <span class="skill-pill">Python</span>
@@ -179,9 +182,9 @@
                     </path>
                   </svg>
                 </div>
-                <h3 class="skill-category-title">Web Development</h3>
+                <h3 class="skill-category-title" data-i18n="about.catWebTitle">Web Development</h3>
               </div>
-              <span class="skill-category-badge">Web Tech</span>
+              <span class="skill-category-badge" data-i18n="about.catWebBadge">Web Tech</span>
             </div>
             <div class="skill-pills">
               <span class="skill-pill">HTML5</span>
@@ -205,9 +208,9 @@
                     <line x1="6" y1="18" x2="6.01" y2="18"></line>
                   </svg>
                 </div>
-                <h3 class="skill-category-title">Systems &amp; Virtualization</h3>
+                <h3 class="skill-category-title" data-i18n="about.catSysTitle">Systems &amp; Virtualization</h3>
               </div>
-              <span class="skill-category-badge">Infrastructure</span>
+              <span class="skill-category-badge" data-i18n="about.catSysBadge">Infrastructure</span>
             </div>
             <div class="skill-pills">
               <span class="skill-pill">Linux</span>
@@ -232,9 +235,9 @@
                     <polyline points="9 12 11 14 15 10"></polyline>
                   </svg>
                 </div>
-                <h3 class="skill-category-title">Security</h3>
+                <h3 class="skill-category-title" data-i18n="about.catSecTitle">Security</h3>
               </div>
-              <span class="skill-category-badge">Monitoring</span>
+              <span class="skill-category-badge" data-i18n="about.catSecBadge">Monitoring</span>
             </div>
             <div class="skill-pills">
               <span class="skill-pill">Wazuh</span>
@@ -252,9 +255,9 @@
                     </path>
                   </svg>
                 </div>
-                <h3 class="skill-category-title">Tools &amp; Workflow</h3>
+                <h3 class="skill-category-title" data-i18n="about.catToolsTitle">Tools &amp; Workflow</h3>
               </div>
-              <span class="skill-category-badge">Tooling</span>
+              <span class="skill-category-badge" data-i18n="about.catToolsBadge">Tooling</span>
             </div>
             <div class="skill-pills">
               <span class="skill-pill">Git</span>
@@ -283,15 +286,15 @@
                     <line x1="1" y1="14" x2="4" y2="14"></line>
                   </svg>
                 </div>
-                <h3 class="skill-category-title">AI &amp; Data Interests</h3>
+                <h3 class="skill-category-title" data-i18n="about.catAiTitle">AI &amp; Data Interests</h3>
               </div>
-              <span class="skill-category-badge">Interests</span>
+              <span class="skill-category-badge" data-i18n="about.catAiBadge">Interests</span>
             </div>
             <div class="skill-pills">
-              <span class="skill-pill">Artificial Intelligence (Interests)</span>
-              <span class="skill-pill">Machine Learning (Interests)</span>
-              <span class="skill-pill">LLMs &amp; RAG (Interests)</span>
-              <span class="skill-pill">Big Data (Interests)</span>
+              <span class="skill-pill" data-i18n="about.aiPillAi">Artificial Intelligence (Interests)</span>
+              <span class="skill-pill" data-i18n="about.aiPillMl">Machine Learning (Interests)</span>
+              <span class="skill-pill" data-i18n="about.aiPillRag">LLMs &amp; RAG (Interests)</span>
+              <span class="skill-pill" data-i18n="about.aiPillBigData">Big Data (Interests)</span>
             </div>
           </div>
 
@@ -309,9 +312,9 @@
                     <path d="M14 18h6"></path>
                   </svg>
                 </div>
-                <h3 class="skill-category-title">Spoken Languages</h3>
+                <h3 class="skill-category-title" data-i18n="about.catLangTitle">Spoken Languages</h3>
               </div>
-              <span class="skill-category-badge">Multilingual</span>
+              <span class="skill-category-badge" data-i18n="about.catLangBadge">Multilingual</span>
             </div>
             <div class="language-list">
               <div class="language-item">
@@ -323,9 +326,9 @@
                       d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
                     </path>
                   </svg>
-                  Arabic
+                  <span data-i18n="about.langArabic">Arabic</span>
                 </span>
-                <span class="language-level language-level--native">Native</span>
+                <span class="language-level language-level--native" data-i18n="about.langArabicLevel">Native</span>
               </div>
               <div class="language-item">
                 <span class="language-name">
@@ -336,9 +339,9 @@
                       d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
                     </path>
                   </svg>
-                  French
+                  <span data-i18n="about.langFrench">French</span>
                 </span>
-                <span class="language-level language-level--b1">B1 — Intermediate</span>
+                <span class="language-level language-level--b1" data-i18n="about.langFrenchLevel">B1 — Intermediate</span>
               </div>
               <div class="language-item">
                 <span class="language-name">
@@ -349,9 +352,9 @@
                       d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
                     </path>
                   </svg>
-                  English
+                  <span data-i18n="about.langEnglish">English</span>
                 </span>
-                <span class="language-level language-level--b1">B1+ — Intermediate</span>
+                <span class="language-level language-level--b1" data-i18n="about.langEnglishLevel">B1+ — Intermediate</span>
               </div>
             </div>
           </div>
@@ -372,24 +375,24 @@
         <div class="timeline timeline--centered">
           <!-- 1. Cybersecurity Intern — SFM Technologies -->
           <div class="timeline__item reveal">
-            <p class="timeline__date">July — August 2026</p>
-            <h3 class="timeline__title">Cybersecurity Intern — SFM Technologies</h3>
+            <p class="timeline__date" data-i18n="about.sfmDate">July — August 2026</p>
+            <h3 class="timeline__title" data-i18n="about.sfmTitle">Cybersecurity Intern — SFM Technologies</h3>
             <ul class="timeline__bullets">
-              <li>Set up a virtualized IT environment for cybersecurity practical work</li>
-              <li>Configured an Active Directory environment and managed users, groups, and OUs</li>
-              <li>Discovered and configured GPO, DNS, DHCP, and SMB shares</li>
-              <li>Discovered security monitoring with Wazuh and worked with Windows, Ubuntu, and Kali Linux virtual
+              <li data-i18n="about.sfmB1">Set up a virtualized IT environment for cybersecurity practical work</li>
+              <li data-i18n="about.sfmB2">Configured an Active Directory environment and managed users, groups, and OUs</li>
+              <li data-i18n="about.sfmB3">Discovered and configured GPO, DNS, DHCP, and SMB shares</li>
+              <li data-i18n="about.sfmB4">Discovered security monitoring with Wazuh and worked with Windows, Ubuntu, and Kali Linux virtual
                 machines</li>
             </ul>
           </div>
 
           <!-- 2. Vice Team Leader — Enactus ISET Djerba -->
           <div class="timeline__item reveal">
-            <p class="timeline__date">Enactus ISET Djerba</p>
-            <h3 class="timeline__title">Vice Team Leader — Enactus ISET Djerba</h3>
+            <p class="timeline__date" data-i18n="about.enactusDate">Nov 2025 – Present</p>
+            <h3 class="timeline__title" data-i18n="about.enactusTitle">Vice Team Leader — Enactus ISET Djerba</h3>
             <ul class="timeline__bullets">
-              <li>Coordinating and supporting a student team and following social-impact projects</li>
-              <li>Developing leadership, communication, and organization skills</li>
+              <li data-i18n="about.enactusB1">Coordinating and supporting a student team and following social-impact projects</li>
+              <li data-i18n="about.enactusB2">Developing leadership, communication, and organization skills</li>
             </ul>
           </div>
         </div>
@@ -405,16 +408,16 @@
         </div>
         <div class="timeline timeline--centered">
           <div class="timeline__item reveal">
-            <p class="timeline__date">2026 — Present</p>
-            <h3 class="timeline__title">Technologies de l'Informatique – DSI (Développement des Systèmes d'Information)
+            <p class="timeline__date" data-i18n="about.isetDate">2026 — Present</p>
+            <h3 class="timeline__title" data-i18n="about.isetTitle">Technologies de l'Informatique – DSI (Développement des Systèmes d'Information)
             </h3>
-            <p class="timeline__desc">Institut Supérieur des Études Technologiques de Djerba (ISET Djerba) · Djerba,
+            <p class="timeline__desc" data-i18n="about.isetDesc">Higher Institute of Technological Studies of Djerba (ISET Djerba) · Djerba,
               Tunisia</p>
           </div>
           <div class="timeline__item reveal">
-            <p class="timeline__date">2025</p>
-            <h3 class="timeline__title">Baccalauréat</h3>
-            <p class="timeline__desc">Diplôme national du baccalauréat · Djerba, Tunisia</p>
+            <p class="timeline__date" data-i18n="about.bacDate">2025</p>
+            <h3 class="timeline__title" data-i18n="about.bacTitle">Baccalauréat</h3>
+            <p class="timeline__desc" data-i18n="about.bacDesc">National Baccalaureate Diploma · Djerba, Tunisia</p>
           </div>
         </div>
       </div>
@@ -473,11 +476,11 @@
       </div>
 
       <div class="footer__right">
-        <div class="footer__label">Phone / WhatsApp:</div>
+        <div class="footer__label" data-i18n="footer.phoneLabel">Phone / WhatsApp:</div>
         <a href="tel:+21650405554" class="button button--white footer__link">
           <span class="button__inner">+216 50 405 554</span>
         </a>
-        <div class="footer__label">Direct Contact:</div>
+        <div class="footer__label" data-i18n="footer.contactLabel">Direct Contact:</div>
         <a href="mailto:mohamedaminebenmasseoud63@gmail.com" class="button button--white footer__link maintainWidth"
           data-copy-link="mohamedaminebenmasseoud63@gmail.com" data-content="mohamedaminebenmasseoud63@gmail.com">
           <span class="button__inner linkLabel"
@@ -488,7 +491,12 @@
   </footer>
 
   <!-- ═══ Back to Top Button ═══ -->
-  <button class="scroll-top-btn" id="scroll-top" aria-label="Scroll to top" title="Scroll to top">↑</button>
+  <button class="scroll-top-btn" id="scroll-top" aria-label="Scroll to top" data-i18n-aria="footer.backToTop">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
 
   <script src="data/i18n.js" defer></script>
   <script src="js/main.js" defer></script>

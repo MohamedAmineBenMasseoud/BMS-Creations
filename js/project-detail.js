@@ -4,6 +4,11 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   loadProjectDetail();
+
+  // Re-render project details on language switch
+  window.addEventListener("bms:langchange", () => {
+    loadProjectDetail();
+  });
 });
 
 const resolvePath = (p) => {
@@ -13,19 +18,40 @@ const resolvePath = (p) => {
   return `../../${p}`;
 };
 
+function getProjectSlug() {
+  const pathParts = window.location.pathname.split("/").filter(Boolean);
+  if (!pathParts.length) return "";
+  const lastPart = pathParts[pathParts.length - 1];
+  if (lastPart.toLowerCase().endsWith(".html")) {
+    return pathParts[pathParts.length - 2] || "";
+  }
+  return lastPart;
+}
+
 function loadProjectDetail() {
   if (typeof PROJECTS === "undefined") return;
 
   // Determine which project we're viewing from the URL path
-  const pathParts = window.location.pathname.split("/").filter(Boolean);
-  const slug = pathParts[pathParts.length - 2] || pathParts[pathParts.length - 1];
+  const slug = getProjectSlug();
 
-  const project = PROJECTS.find((p) => p.id === slug);
-  if (!project) {
+  const rawProject = PROJECTS.find((p) => p.id === slug);
+  if (!rawProject) {
     document.getElementById("project-title") &&
       (document.getElementById("project-title").textContent = "Project Not Found");
     return;
   }
+
+  const currentLang =
+    (typeof window.bmsGetLanguage === "function"
+      ? window.bmsGetLanguage()
+      : document.documentElement.lang) || "en";
+
+  const project =
+    typeof window.bmsLocalizeProject === "function"
+      ? window.bmsLocalizeProject(rawProject, currentLang)
+      : currentLang === "fr" && rawProject.fr
+      ? { ...rawProject, ...rawProject.fr }
+      : rawProject;
 
   // Populate hero
   setTextById("project-title", project.title);
@@ -41,6 +67,16 @@ function loadProjectDetail() {
     heroBg.setAttribute("height", "900");
     heroBg.setAttribute("fetchpriority", "high");
     heroBg.setAttribute("decoding", "async");
+  }
+
+  // Featured preview image
+  const previewImg = document.getElementById("project-preview-img");
+  const previewSource = document.getElementById("project-preview-source");
+  if (previewImg && project.thumbnail) {
+    const thumbPath = resolvePath(project.thumbnail);
+    previewImg.src = thumbPath;
+    previewImg.alt = `${project.title} interface preview`;
+    if (previewSource) previewSource.srcset = thumbPath;
   }
 
   // Tags
@@ -77,13 +113,43 @@ function loadProjectDetail() {
     repoLink.rel = "noopener noreferrer";
   }
 
-  const currentLang = window.bmsGetLanguage ? window.bmsGetLanguage() : "en";
-
   // Sidebar meta
   setTextById("project-date", formatDate(project.date, currentLang));
   setTextById("project-cat-value", formatCategory(project.category, currentLang));
+  setTextById(
+    "project-type-value",
+    project.statCategory || formatCategory(project.category, currentLang)
+  );
   setOptionalSidebarItem("project-role", project.role);
   setOptionalSidebarItem("project-duration", project.duration);
+
+  // Sidebar technologies & quick links
+  const sidebarTags = document.getElementById("project-sidebar-tags");
+  if (sidebarTags && Array.isArray(project.tags)) {
+    sidebarTags.innerHTML = project.tags
+      .map((t) => `<span class="tag">${t}</span>`)
+      .join("");
+  }
+
+  const sideLive = document.getElementById("sidebar-live-link");
+  if (sideLive) {
+    if (project.liveUrl) {
+      sideLive.href = project.liveUrl;
+      sideLive.style.display = "inline-flex";
+    } else {
+      sideLive.style.display = "none";
+    }
+  }
+
+  const sideRepo = document.getElementById("sidebar-repo-link");
+  if (sideRepo) {
+    if (project.repoUrl) {
+      sideRepo.href = project.repoUrl;
+      sideRepo.style.display = "inline-flex";
+    } else {
+      sideRepo.style.display = "none";
+    }
+  }
 
   // Problem & Solution
   setOptionalSection("project-problem", project.problem);
@@ -99,25 +165,34 @@ function loadProjectDetail() {
       ? project.challenges.length > 0 && !project.challenges[0].startsWith("TODO_")
       : Boolean(project.challenges) && !project.challenges.startsWith("TODO_");
     if (hasChallenges) {
-      const items = Array.isArray(project.challenges) ? project.challenges : [project.challenges];
+      const items = Array.isArray(project.challenges)
+        ? project.challenges
+        : [project.challenges];
       challengesList.innerHTML = items.map((c) => `<li>${c}</li>`).join("");
-      if (challengesList.previousElementSibling) challengesList.previousElementSibling.style.display = "";
+      if (challengesList.previousElementSibling)
+        challengesList.previousElementSibling.style.display = "";
       challengesList.style.display = "";
     } else {
       challengesList.innerHTML = "";
       challengesList.style.display = "none";
-      if (challengesList.previousElementSibling) challengesList.previousElementSibling.style.display = "none";
+      if (challengesList.previousElementSibling)
+        challengesList.previousElementSibling.style.display = "none";
     }
   }
 
-  // Camera Permission / Privacy Notice
+  // Camera Permission / Privacy Notice (respects I18N without race conditions)
   const cameraNotice = document.getElementById("project-camera-notice");
   if (cameraNotice) {
-    if (project.cameraNotice) {
+    if (rawProject.cameraNotice) {
       cameraNotice.style.display = "flex";
       const noticeText = document.getElementById("project-camera-notice-text");
-      if (noticeText && typeof project.cameraNotice === "string") {
-        noticeText.textContent = project.cameraNotice;
+      if (noticeText) {
+        const i18nNotice =
+          typeof I18N !== "undefined" &&
+          I18N[currentLang] &&
+          I18N[currentLang].detail &&
+          I18N[currentLang].detail.cameraNoticeText;
+        noticeText.textContent = i18nNotice || rawProject.cameraNotice;
       }
     } else {
       cameraNotice.style.display = "none";
@@ -140,7 +215,7 @@ function loadProjectDetail() {
   }
 
   // Related projects
-  renderRelated(project);
+  renderRelated(rawProject);
 
   // Page title
   document.title = `${project.title} — Portfolio`;
@@ -151,11 +226,23 @@ function renderRelated(current) {
   const grid = document.getElementById("related-grid");
   if (!grid) return;
 
+  const currentLang =
+    (typeof window.bmsGetLanguage === "function"
+      ? window.bmsGetLanguage()
+      : document.documentElement.lang) || "en";
+
   const related = PROJECTS.filter((p) => p.id !== current.id).slice(0, 2);
 
   grid.innerHTML = related
-    .map(
-      (p) => `
+    .map((raw) => {
+      const p =
+        typeof window.bmsLocalizeProject === "function"
+          ? window.bmsLocalizeProject(raw, currentLang)
+          : currentLang === "fr" && raw.fr
+          ? { ...raw, ...raw.fr }
+          : raw;
+
+      return `
     <a href="../${p.id}/index.html" class="project-card glass reveal">
       <div class="project-card__image">
         <picture>
@@ -169,8 +256,8 @@ function renderRelated(current) {
         <h3 class="project-card__title">${p.title}</h3>
         <p class="project-card__desc">${p.description}</p>
       </div>
-    </a>`
-    )
+    </a>`;
+    })
     .join("");
 
   // Trigger reveals
@@ -241,15 +328,3 @@ function formatDate(dateStr, lang = "en") {
   const idx = parseInt(month, 10) - 1;
   return `${months[idx] || month} ${year}`;
 }
-
-window.addEventListener("bms:langchange", (e) => {
-  const lang = e.detail?.lang || "en";
-  if (typeof PROJECTS === "undefined") return;
-  const pathParts = window.location.pathname.split("/").filter(Boolean);
-  const slug = pathParts[pathParts.length - 2] || pathParts[pathParts.length - 1];
-  const project = PROJECTS.find((p) => p.id === slug);
-  if (project) {
-    setTextById("project-date", formatDate(project.date, lang));
-    setTextById("project-cat-value", formatCategory(project.category, lang));
-  }
-});

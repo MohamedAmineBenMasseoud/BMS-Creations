@@ -32,8 +32,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png" />
-  <link rel="manifest" href="site.webmanifest" />
-  <meta name="theme-color" content="#0d0f17" />
+  <meta name="theme-color" content="#eceae4" />
 
   <!-- Google Fonts: Preconnect & Optimized Display Swap -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -55,7 +54,7 @@
         bms.creations <span class="dot"></span>
       </a>
 
-      <div class="nav__links rf-links">
+      <div class="nav__links rf-links" id="nav-links">
         <a href="index.html" class="link nav__link rf-link underLink" data-content="home">
           <span data-i18n="nav.home">home</span>
         </a>
@@ -84,12 +83,16 @@
         <a href="contact.html" class="button button--nav button--black">
           <span class="button__inner" data-i18n="nav.hireMe">hire me</span>
         </a>
-      </div>
+                <button class="nav__toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" data-i18n-aria="nav.toggleMenu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
     </div>
   </nav>
 
   <!-- ═══ Main Content ═══ -->
   <main id="main-content">
+    <div class="scroll-progress-bar" id="scroll-progress"></div>
 
     <!-- ═══ Contact Section ═══ -->
     <section class="section section--page-top">
@@ -106,8 +109,8 @@
         </div>
 
         <div class="contact-grid">
-          <!-- Left — Info -->
-          <div class="contact-info reveal">
+          <!-- Left — Info Card -->
+          <div class="contact-info-card reveal">
             <div class="contact-item">
               <div class="contact-item__icon">
                 <svg class="reicon" viewBox="0 0 24 24">
@@ -115,10 +118,10 @@
                   <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
               </div>
-              <div>
+              <div class="contact-item__text">
                 <p class="contact-item__label" data-i18n="contact.infoEmail">Email</p>
                 <a href="mailto:mohamedaminebenmasseoud63@gmail.com"
-                  class="contact-item__value">mohamedaminebenmasseoud63@gmail.com</a>
+                  class="contact-item__value contact-item__value--email">mohamedaminebenmasseoud63@gmail.com</a>
               </div>
             </div>
 
@@ -130,7 +133,7 @@
                   </path>
                 </svg>
               </div>
-              <div>
+              <div class="contact-item__text">
                 <p class="contact-item__label" data-i18n="contact.infoPhone">Phone &amp; WhatsApp</p>
                 <div class="contact-item__row">
                   <a href="tel:+21650405554" class="contact-item__value">+216 50 405 554</a>
@@ -154,9 +157,9 @@
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
               </div>
-              <div>
+              <div class="contact-item__text">
                 <p class="contact-item__label" data-i18n="contact.infoLocation">Location</p>
-                <p class="contact-item__value" data-i18n="contact.infoLocationVal">Bizerte, Tunisia</p>
+                <p class="contact-item__value" data-i18n="contact.infoLocationVal" id="contact-location-val">Djerba / Bizerte, Tunisia</p>
               </div>
             </div>
 
@@ -167,13 +170,13 @@
                   <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                 </svg>
               </div>
-              <div>
+              <div class="contact-item__text">
                 <p class="contact-item__label" data-i18n="contact.infoAvailability">Availability</p>
                 <p class="contact-item__value" data-i18n="contact.infoAvailabilityVal">Open for engineering &amp; collaboration opportunities</p>
               </div>
             </div>
 
-            <!-- Social Channels Row -->
+            <!-- Social Channels Row Inside Unified Card -->
             <div class="contact-connect-group">
               <p class="contact-connect-title" data-i18n="contact.connectDirectly">Connect Directly:</p>
               <div class="contact-socials">
@@ -229,23 +232,32 @@
             <input type="hidden" name="access_key" value="55812487-877a-4648-a266-64f19029d19f" />
             <input type="checkbox" name="botcheck" class="form-honeypot" tabindex="-1" autocomplete="off" />
 
+            <div class="contact-form__header">
+              <h2 class="contact-form__title" data-i18n="contact.formTitle">Send a Message</h2>
+              <p class="contact-form__subtitle" data-i18n="contact.formSubtitle">Fill out the form below and I'll reply within 24 hours.</p>
+            </div>
+
+            <div class="contact-form__row">
+              <div class="form-group">
+                <input type="text" id="name" name="name" placeholder="Your Name" aria-label="Your Name"
+                  data-i18n-aria="contact.nameLabel" data-i18n-placeholder="contact.nameLabel"
+                  required />
+                <span class="form-field-error" id="name-error" data-i18n="contact.valName">Please enter your name.</span>
+              </div>
+              <div class="form-group">
+                <input type="email" id="email" name="email" placeholder="Your Email" aria-label="Your Email"
+                  data-i18n-aria="contact.emailLabel" data-i18n-placeholder="contact.emailLabel" required />
+                <span class="form-field-error" id="email-error" data-i18n="contact.valEmail">Please enter a valid email address.</span>
+              </div>
+            </div>
+
             <div class="form-group">
-              <input type="text" id="name" name="name" placeholder="Your Name" data-i18n-placeholder="contact.nameLabel"
-                required />
-              <span class="form-field-error" id="name-error" data-i18n="contact.valName">Please enter your name.</span>
+              <input type="text" id="subject" name="subject" placeholder="Subject" aria-label="Subject"
+                data-i18n-aria="contact.subjectLabel" data-i18n-placeholder="contact.subjectLabel" />
             </div>
             <div class="form-group">
-              <input type="email" id="email" name="email" placeholder="Your Email"
-                data-i18n-placeholder="contact.emailLabel" required />
-              <span class="form-field-error" id="email-error" data-i18n="contact.valEmail">Please enter a valid email address.</span>
-            </div>
-            <div class="form-group">
-              <input type="text" id="subject" name="subject" placeholder="Subject"
-                data-i18n-placeholder="contact.subjectLabel" />
-            </div>
-            <div class="form-group">
-              <textarea id="message" name="message" placeholder="Your Message"
-                data-i18n-placeholder="contact.messageLabel" required></textarea>
+              <textarea id="message" name="message" placeholder="Your Message" aria-label="Your Message"
+                data-i18n-aria="contact.messageLabel" data-i18n-placeholder="contact.messageLabel" required></textarea>
               <span class="form-field-error" id="message-error" data-i18n="contact.valMessage">Please enter a message (at least 5 characters).</span>
             </div>
             <button type="submit" class="button button--solid button--nav btn--full-center" id="contact-submit-btn"
@@ -313,11 +325,11 @@
       </div>
 
       <div class="footer__right">
-        <div class="footer__label">Phone / WhatsApp:</div>
+        <div class="footer__label" data-i18n="footer.phoneLabel">Phone / WhatsApp:</div>
         <a href="tel:+21650405554" class="button button--white footer__link">
           <span class="button__inner">+216 50 405 554</span>
         </a>
-        <div class="footer__label">Direct Contact:</div>
+        <div class="footer__label" data-i18n="footer.contactLabel">Direct Contact:</div>
         <a href="mailto:mohamedaminebenmasseoud63@gmail.com" class="button button--white footer__link maintainWidth"
           data-copy-link="mohamedaminebenmasseoud63@gmail.com" data-content="mohamedaminebenmasseoud63@gmail.com">
           <span class="button__inner linkLabel"
@@ -328,7 +340,12 @@
   </footer>
 
   <!-- ═══ Back to Top Button ═══ -->
-  <button class="scroll-top-btn" id="scroll-top" aria-label="Scroll to top" title="Scroll to top">↑</button>
+  <button class="scroll-top-btn" id="scroll-top" aria-label="Scroll to top" data-i18n-aria="footer.backToTop">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
 
   <script src="data/i18n.js" defer></script>
   <script src="js/main.js" defer></script>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="loading-done">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8" />
@@ -33,8 +33,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png" />
-  <link rel="manifest" href="site.webmanifest" />
-  <meta name="theme-color" content="#0d0f17" />
+  <meta name="theme-color" content="#eceae4" />
 
   <!-- Google Fonts: Preconnect & Optimized Display Swap -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -72,7 +71,7 @@
 
 <body class="rf-page">
   <!-- ═══ Skip to Content (A11y) ═══ -->
-  <a href="#main-content" class="skip-to-content">Skip to content</a>
+  <a href="#main-content" class="skip-to-content" data-i18n="nav.skipToContent">Skip to content</a>
 
   <!-- ═══ Scroll Progress Bar ═══ -->
   <div class="scroll-progress-bar" id="scroll-progress"></div>
@@ -112,7 +111,7 @@
           bms.creations <span class="dot"></span>
         </a>
 
-        <div class="nav__links rf-links">
+        <div class="nav__links rf-links" id="nav-links">
           <a href="#home-projects" class="link nav__link rf-link underLink active" data-content="projects"
             aria-current="page">
             <span data-i18n="nav.projects">projects</span>
@@ -141,6 +140,9 @@
           <a href="contact.html" class="button button--nav button--black">
             <span class="button__inner" data-i18n="nav.hireMe">hire me</span>
           </a>
+                  <button class="nav__toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" data-i18n-aria="nav.toggleMenu">
+            <span></span><span></span><span></span>
+          </button>
         </div>
       </div>
     </nav>
@@ -170,10 +172,10 @@
             <div class="homeHeader__snippet flip-snippet">
               <span class="flip-fixed" data-i18n="hero.officialHome">The official home for all of my :</span>
               <span class="flip-words-wrapper">
-                <span class="flip-word active">software engineering</span>
-                <span class="flip-word">systems &amp; security</span>
-                <span class="flip-word">interactive web apps</span>
-                <span class="flip-word">AI &amp; intelligent tools</span>
+                <span class="flip-word active" data-i18n="hero.flipWord1">software engineering</span>
+                <span class="flip-word" data-i18n="hero.flipWord2">systems &amp; security</span>
+                <span class="flip-word" data-i18n="hero.flipWord3">interactive web apps</span>
+                <span class="flip-word" data-i18n="hero.flipWord4">AI &amp; intelligent tools</span>
               </span>
             </div>
             <div class="homeHeader__link">
@@ -201,78 +203,72 @@
         <div class="homeFeatures__stickyWrap" id="sticky-bar">
           <div class="homeFeatures__sticky">
             <div class="homeFeatures__stickyHeadings">
-              <div class="homeFeatures__stickyHeading active" data-target="home-projects">P R O J E C T S</div>
-              <div class="homeFeatures__stickyHeading" data-target="home-skills">S K I L L S</div>
-              <div class="homeFeatures__stickyHeading" data-target="home-about">A B O U T</div>
+              <div class="homeFeatures__stickyHeading active" data-target="home-projects" data-i18n="hero.stickyProjects">P R O J E C T S</div>
+              <div class="homeFeatures__stickyHeading" data-target="home-skills" data-i18n="hero.stickySkills">S K I L L S</div>
+              <div class="homeFeatures__stickyHeading" data-target="home-about" data-i18n="hero.stickyAbout">A B O U T</div>
             </div>
 
             <div class="homeFeatures__stickySnippets">
               <div class="homeFeatures__stickySnippet active" data-snippet="home-projects">
-                <p>Web applications, interactive systems, and client-side experiments</p>
+                <p data-i18n="hero.snippetProjects">Web applications, interactive systems, and client-side experiments</p>
               </div>
               <div class="homeFeatures__stickySnippet" data-snippet="home-skills">
-                <p>Programming languages, Linux/Windows systems, cybersecurity labs, web development &amp; AI</p>
+                <p data-i18n="hero.snippetSkills">Programming languages, Linux/Windows systems, cybersecurity labs, web development &amp; AI</p>
               </div>
               <div class="homeFeatures__stickySnippet" data-snippet="home-about">
-                <p>Background, design philosophy, and UI/UX visual experiments</p>
+                <p data-i18n="hero.snippetAbout">Background, design philosophy, and UI/UX visual experiments</p>
               </div>
             </div>
 
             <div class="homeFeatures__stickyLinks">
               <div class="homeFeatures__stickyLink underLink active" data-link="home-projects">
-                <a href="projects.html" class="link"><span>view all projects</span></a>
+                <a href="projects.html" class="link"><span data-i18n="hero.linkProjects">view all projects</span></a>
               </div>
               <div class="homeFeatures__stickyLink underLink" data-link="home-skills">
-                <a href="about.html" class="link"><span>view skills</span></a>
+                <a href="about.html" class="link"><span data-i18n="hero.linkSkills">view skills</span></a>
               </div>
               <div class="homeFeatures__stickyLink underLink" data-link="home-about">
-                <a href="contact.html" class="link"><span>contact me</span></a>
+                <a href="contact.html" class="link"><span data-i18n="hero.linkAbout">contact me</span></a>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ── Orbit Card Stack (Interactive Project Showcase) ── -->
+        <!-- ── Case Study Flip Stack (Componentry Editorial Scroll-Driven Stack) ── -->
         <div class="homeFeatures__projectsSection" id="home-projects">
-          <section class="orbit-section">
-            <div class="orbit-header">
-              <div class="orbit-header__viewing">
-                <p class="orbit-header__label">Currently viewing</p>
-                <h2 class="orbit-header__title" id="orbit-title">StageConnect ISET</h2>
-                <p class="orbit-header__role" id="orbit-role">Internship Platform Prototype · 2026</p>
-                <p class="orbit-header__desc" id="orbit-desc">
-                  A static internship management platform prototype for ISET Djerba students and partner companies,
-                  featuring internship search, simulated dashboards, and Google Sheets integration.
-                </p>
-              </div>
-              <div class="orbit-header__actions">
-                <a href="https://mohamedaminebenmasseoud.github.io/StageConnect-ISET/" target="_blank"
-                  rel="noopener noreferrer" class="button button--solid" id="orbit-link">
-                  <span class="button__inner" data-i18n="hero.liveDemo">live demo ↗</span>
-                </a>
-                <a href="projects/stageconnect/index.html" class="button button--white" id="orbit-detail-link">
-                  <span class="button__inner" data-i18n="hero.details">details →</span>
-                </a>
-                <a href="projects.html" class="button button--white">
-                  <span class="button__inner" data-i18n="hero.allProjects">all projects</span>
-                </a>
-              </div>
-            </div>
+          <section class="flip-stack-section" aria-label="Featured Case Studies">
+            <div class="flip-stack-container" id="flip-stack-container">
 
-            <!-- Orbit Card Stack Deck -->
-            <div class="orbit-stage-wrapper">
-              <div class="orbit-card-stack" id="orbit-stack">
-                <!-- Dynamically populated from PROJECTS in data/projects.js -->
-              </div>
+              <!-- Sticky Stage (Fixed Viewport for Flip Animation) -->
+              <div class="flip-stack-stage" id="flip-stack-stage">
 
-              <!-- Deck Controls (Prev/Next & Dots) -->
-              <div class="orbit-controls">
-                <button class="orbit-nav-btn" id="orbit-prev" aria-label="Previous Project">←</button>
-                <div class="orbit-dots" id="orbit-dots">
+                <!-- 3D Card Flip Deck Stage -->
+                <div class="flip-card-deck" id="flip-deck" role="region" aria-roledescription="carousel"
+                  aria-label="Case Study Flip Stack">
                   <!-- Dynamically populated from PROJECTS in data/projects.js -->
                 </div>
-                <button class="orbit-nav-btn" id="orbit-next" aria-label="Next Project">→</button>
+
+                <!-- Bottom Progress Track -->
+                <div class="flip-stack-progress">
+                  <div class="flip-stack-progress__bar" id="flip-progress-bar"></div>
+                </div>
+
               </div>
+
+              <!-- End of Stack Prompt -->
+              <div class="flip-stack-end" id="flip-stack-end">
+                <div class="flip-stack-end__inner">
+                  <span class="flip-stack-end__badge" data-i18n="hero.archiveReady">Archive Ready</span>
+                  <h3 class="flip-stack-end__title" data-i18n="hero.archivePrompt">Looking for more work?</h3>
+                  <p class="flip-stack-end__desc" data-i18n="hero.archiveDesc">
+                    Browse full repository codebases, interactive demos, and academic systems.
+                  </p>
+                  <a href="projects.html" class="button button--solid">
+                    <span class="button__inner" data-i18n="hero.viewArchive">view all projects →</span>
+                  </a>
+                </div>
+              </div>
+
             </div>
           </section>
         </div>
@@ -288,17 +284,17 @@
                   <div class="wCard__top">
                     <span class="wCard__count">(00)</span>
                     <div class="wCard__date">
-                      <span class="dot dot--red"></span> <span>core engineering</span>
+                      <span class="dot dot--red"></span> <span data-i18n="hero.wCard0Tag">core engineering</span>
                     </div>
-                    <div class="wCard__title">Systems, Algorithms &amp; Multi-Language Foundations</div>
+                    <div class="wCard__title" data-i18n="hero.wCard0Title">Systems, Algorithms &amp; Multi-Language Foundations</div>
                   </div>
-                  <div class="wCard__snippet">
+                  <div class="wCard__snippet" data-i18n="hero.wCard0Snippet">
                     Building robust, reliable software grounded in core CS fundamentals (Algorithms, Data Structures,
                     Database Fundamentals) with multi-paradigm programming in JavaScript, Python, C, Java, PHP, and SQL.
                   </div>
-                  <a href="about.html#skills" class="wCard__displayLink underLink">explore technical matrix →</a>
+                  <span class="wCard__displayLink underLink" data-i18n="hero.wCard0Link">explore technical matrix →</span>
                 </div>
-                <a class="wCard__link" href="about.html#skills"></a>
+                <a class="wCard__link" href="about.html#skills" aria-label="Systems, Algorithms &amp; Multi-Language Foundations"></a>
               </div>
             </div>
 
@@ -310,16 +306,16 @@
                   <div class="wCard__top">
                     <span class="wCard__count">(01)</span>
                     <div class="wCard__date">
-                      <span class="dot dot--green"></span> <span>systems &amp; networking</span>
+                      <span class="dot dot--green"></span> <span data-i18n="hero.wCard1Tag">systems &amp; networking</span>
                     </div>
-                    <div class="wCard__title">Linux/Windows SysAdmin &amp; Cybersecurity Labs</div>
+                    <div class="wCard__title" data-i18n="hero.wCard1Title">Linux/Windows SysAdmin &amp; Cybersecurity Labs</div>
                   </div>
-                  <div class="wCard__snippet">Hands-on enterprise administration in Ubuntu/Linux &amp; Windows
+                  <div class="wCard__snippet" data-i18n="hero.wCard1Snippet">Hands-on enterprise administration in Ubuntu/Linux &amp; Windows
                     environments, Active Directory, Group Policy, DNS/DHCP, SMB, and Wazuh SIEM security event
                     monitoring.</div>
-                  <span class="wCard__displayLink underLink">view lab experience →</span>
+                  <span class="wCard__displayLink underLink" data-i18n="hero.wCard1Link">view lab experience →</span>
                 </div>
-                <a class="wCard__link" href="about.html#skills"></a>
+                <a class="wCard__link" href="about.html#skills" aria-label="Linux/Windows SysAdmin &amp; Cybersecurity Labs"></a>
               </div>
 
               <div class="wCard" data-category="web">
@@ -327,15 +323,15 @@
                   <div class="wCard__top">
                     <span class="wCard__count">(02)</span>
                     <div class="wCard__date">
-                      <span class="dot dot--purple"></span> <span>web development</span>
+                      <span class="dot dot--purple"></span> <span data-i18n="hero.wCard2Tag">web development</span>
                     </div>
-                    <div class="wCard__title">Modern Frontend, DOM &amp; Vanilla Architecture</div>
+                    <div class="wCard__title" data-i18n="hero.wCard2Title">Modern Frontend, DOM &amp; Vanilla Architecture</div>
                   </div>
-                  <div class="wCard__snippet">Crafting responsive, accessible user interfaces with HTML5, CSS3, DOM
+                  <div class="wCard__snippet" data-i18n="hero.wCard2Snippet">Crafting responsive, accessible user interfaces with HTML5, CSS3, DOM
                     manipulation, client-side state persistence (LocalStorage), and modular JS architectures.</div>
-                  <span class="wCard__displayLink underLink">view web skills →</span>
+                  <span class="wCard__displayLink underLink" data-i18n="hero.wCard2Link">view web skills →</span>
                 </div>
-                <a class="wCard__link" href="about.html#skills"></a>
+                <a class="wCard__link" href="about.html#skills" aria-label="Modern Frontend, DOM &amp; Vanilla Architecture"></a>
               </div>
 
               <div class="wCard" data-category="ai">
@@ -343,15 +339,15 @@
                   <div class="wCard__top">
                     <span class="wCard__count">(03)</span>
                     <div class="wCard__date">
-                      <span class="dot dot--red"></span> <span>areas of interest</span>
+                      <span class="dot dot--red"></span> <span data-i18n="hero.wCard3Tag">areas of interest</span>
                     </div>
-                    <div class="wCard__title">AI, Machine Learning, LLMs &amp; RAG Systems</div>
+                    <div class="wCard__title" data-i18n="hero.wCard3Title">AI, Machine Learning, LLMs &amp; RAG Systems</div>
                   </div>
-                  <div class="wCard__snippet">Exploring modern machine learning paradigms, deep learning fundamentals,
+                  <div class="wCard__snippet" data-i18n="hero.wCard3Snippet">Exploring modern machine learning paradigms, deep learning fundamentals,
                     large language models (LLMs), retrieval-augmented generation (RAG), and big data workflows.</div>
-                  <span class="wCard__displayLink underLink">view interests →</span>
+                  <span class="wCard__displayLink underLink" data-i18n="hero.wCard3Link">view interests →</span>
                 </div>
-                <a class="wCard__link" href="about.html#skills"></a>
+                <a class="wCard__link" href="about.html#skills" aria-label="AI, Machine Learning, LLMs &amp; RAG Systems"></a>
               </div>
 
               <div class="wCard" data-category="leadership">
@@ -359,15 +355,15 @@
                   <div class="wCard__top">
                     <span class="wCard__count">(04)</span>
                     <div class="wCard__date">
-                      <span class="dot dot--purple"></span> <span>ui/ux &amp; leadership</span>
+                      <span class="dot dot--purple"></span> <span data-i18n="hero.wCard4Tag">ui/ux &amp; leadership</span>
                     </div>
-                    <div class="wCard__title">UI/UX Design, Coordination &amp; Team Leadership</div>
+                    <div class="wCard__title" data-i18n="hero.wCard4Title">UI/UX Design, Coordination &amp; Team Leadership</div>
                   </div>
-                  <div class="wCard__snippet">Interface wireframing and visual identity in Figma &amp; Canva, backed by
+                  <div class="wCard__snippet" data-i18n="hero.wCard4Snippet">Interface wireframing and visual identity in Figma &amp; Canva, backed by
                     professional experience in team leadership, project coordination, and technical documentation.</div>
-                  <span class="wCard__displayLink underLink">view leadership →</span>
+                  <span class="wCard__displayLink underLink" data-i18n="hero.wCard4Link">view leadership →</span>
                 </div>
-                <a class="wCard__link" href="about.html#skills"></a>
+                <a class="wCard__link" href="about.html#skills" aria-label="UI/UX Design, Coordination &amp; Team Leadership"></a>
               </div>
 
             </div>
@@ -398,9 +394,9 @@
                         <polyline points="8 6 2 12 8 18"></polyline>
                       </svg>
                     </div>
-                    <h3 class="homeSkills__cardTitle">Languages</h3>
+                    <h3 class="homeSkills__cardTitle" data-i18n="hero.card1Title">Languages</h3>
                   </div>
-                  <span class="homeSkills__cardBadge">7 Languages</span>
+                  <span class="homeSkills__cardBadge" data-i18n="hero.card1Badge">7 Languages</span>
                 </div>
                 <div class="skill-pills">
                   <span class="skill-pill">Python</span>
@@ -425,9 +421,9 @@
                         <line x1="6" y1="18" x2="6.01" y2="18"></line>
                       </svg>
                     </div>
-                    <h3 class="homeSkills__cardTitle">Systems &amp; Security</h3>
+                    <h3 class="homeSkills__cardTitle" data-i18n="hero.card2Title">Systems &amp; Security</h3>
                   </div>
-                  <span class="homeSkills__cardBadge">Systems &amp; Sec</span>
+                  <span class="homeSkills__cardBadge" data-i18n="hero.card2Badge">Systems &amp; Sec</span>
                 </div>
                 <div class="skill-pills">
                   <span class="skill-pill">Linux</span>
@@ -455,9 +451,9 @@
                         </path>
                       </svg>
                     </div>
-                    <h3 class="homeSkills__cardTitle">Web &amp; Tools</h3>
+                    <h3 class="homeSkills__cardTitle" data-i18n="hero.card3Title">Web &amp; Tools</h3>
                   </div>
-                  <span class="homeSkills__cardBadge">Web &amp; Dev</span>
+                  <span class="homeSkills__cardBadge" data-i18n="hero.card3Badge">Web &amp; Dev</span>
                 </div>
                 <div class="skill-pills">
                   <span class="skill-pill">HTML5</span>
@@ -490,93 +486,33 @@
                         <line x1="1" y1="14" x2="4" y2="14"></line>
                       </svg>
                     </div>
-                    <h3 class="homeSkills__cardTitle">Interests &amp; Languages</h3>
+                    <h3 class="homeSkills__cardTitle" data-i18n="hero.card4Title">Interests &amp; Languages</h3>
                   </div>
-                  <span class="homeSkills__cardBadge">Interests</span>
+                  <span class="homeSkills__cardBadge" data-i18n="hero.card4Badge">Interests</span>
                 </div>
                 <div class="skill-pills">
-                  <span class="skill-pill">AI &amp; ML (Interests)</span>
-                  <span class="skill-pill">Big Data (Interests)</span>
-                  <span class="skill-pill">Arabic (Native)</span>
-                  <span class="skill-pill">French (B1)</span>
-                  <span class="skill-pill">English (B1+)</span>
+                  <span class="skill-pill" data-i18n="hero.pillAi">AI &amp; ML (Interests)</span>
+                  <span class="skill-pill" data-i18n="hero.pillBigData">Big Data (Interests)</span>
+                  <span class="skill-pill" data-i18n="hero.pillArabic">Arabic (Native)</span>
+                  <span class="skill-pill" data-i18n="hero.pillFrench">French (B1)</span>
+                  <span class="skill-pill" data-i18n="hero.pillEnglish">English (B1+)</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- ── Visual Gallery Slider (Radical Face gallerySlider style) ── -->
-        <div class="homeFeatures__visualSection" id="home-about">
-          <section class="gallerySlider">
-            <div class="gallerySlider__inner" id="gallery-slider-inner">
-              <div class="gallerySlider__rail">
-                <div class="gallerySlider__item">
-                  <picture>
-                    <source srcset="assets/screenshots/StageConnect-ISET.webp" type="image/webp" />
-                    <img src="assets/screenshots/StageConnect-ISET.webp" alt="StageConnect ISET Platform" width="1341"
-                      height="892" loading="lazy" decoding="async" />
-                  </picture>
-                </div>
-                <div class="gallerySlider__item">
-                  <picture>
-                    <source srcset="assets/screenshots/enactusIsetDjerba.webp" type="image/webp" />
-                    <img src="assets/screenshots/enactusIsetDjerba.webp" alt="Enactus ISET Djerba" width="1647"
-                      height="970" loading="lazy" decoding="async" />
-                  </picture>
-                </div>
-                <div class="gallerySlider__item">
-                  <picture>
-                    <source srcset="assets/screenshots/Particle-Heart.webp" type="image/webp" />
-                    <img src="assets/screenshots/Particle-Heart.webp" alt="Hand Tracking &amp; 3D Particle System"
-                      width="1898" height="971" loading="lazy" decoding="async" />
-                  </picture>
-                </div>
-                <div class="gallerySlider__item">
-                  <picture>
-                    <source srcset="assets/screenshots/My-Plot-Twist-by-SYZ.webp" type="image/webp" />
-                    <img src="assets/screenshots/My-Plot-Twist-by-SYZ.webp" alt="SYZ — My Plot Twist" width="1263"
-                      height="973" loading="lazy" decoding="async" />
-                  </picture>
-                </div>
-                <div class="gallerySlider__item">
-                  <picture>
-                    <source srcset="assets/screenshots/Gesture-Puzzle.webp" type="image/webp" />
-                    <img src="assets/screenshots/Gesture-Puzzle.webp" alt="Gesture Puzzle Studio Edition" width="1282"
-                      height="957" loading="lazy" decoding="async" />
-                  </picture>
-                </div>
-                <div class="gallerySlider__item">
-                  <picture>
-                    <source srcset="assets/images/me.webp" type="image/webp" />
-                    <img src="assets/images/me.webp" alt="Mohamed Amine — BMS Creations" width="591" height="880"
-                      loading="lazy" decoding="async" />
-                  </picture>
-                </div>
-              </div>
-            </div>
-            <div class="gallerySlider__nav">
-              <button class="button button--black button--nav" id="gallery-prev" aria-label="Previous gallery slide">
-                <span class="button__inner">prev</span>
-              </button>
-              <button class="button button--black button--nav" id="gallery-next" aria-label="Next gallery slide">
-                <span class="button__inner">next</span>
-              </button>
-            </div>
-          </section>
         </div>
 
       </section>
 
       <!-- ── Quote / Contact Subscribe Section ── -->
-      <section class="subscribe">
+      <section class="subscribe" id="home-about">
         <div class="subscribe__inner">
-          <div class="subscribe__heading">Start a Conversation</div>
-          <div class="subscribe__quote">
+          <div class="subscribe__heading" data-i18n="hero.conversationHeading">Start a Conversation</div>
+          <div class="subscribe__quote" data-i18n="hero.quoteText">
             “I build with purpose, discipline, and craft. I don't believe in boilerplate digital noise — whether you
             have an ambitious product to ship or want to discuss creative technology, let's connect.”
           </div>
-          <div class="subscribe__attribution">Med Amine (BMS Creations)</div>
+          <div class="subscribe__attribution" data-i18n="hero.quoteAuthor">Med Amine (BMS Creations)</div>
           <div class="subscribe__form">
             <form class="subscribeForm" id="subscribe-form" novalidate>
               <input type="hidden" name="access_key" value="55812487-877a-4648-a266-64f19029d19f" />
@@ -587,11 +523,14 @@
               <div class="subscribeForm__inner">
                 <div class="subscribeForm__row">
                   <input class="textField" type="text" name="name" id="sub-name" placeholder="Your Name"
+                    aria-label="Your Name" data-i18n-aria="contact.nameLabel"
                     data-i18n-placeholder="contact.nameLabel" required />
                   <input class="textField" type="email" name="email" id="sub-email" placeholder="Your Email"
+                    aria-label="Your Email" data-i18n-aria="contact.emailLabel"
                     data-i18n-placeholder="contact.emailLabel" required />
                 </div>
                 <textarea class="textField" name="message" id="sub-message" placeholder="Your message"
+                  aria-label="Your message" data-i18n-aria="contact.homeMsgPlaceholder"
                   data-i18n-placeholder="contact.homeMsgPlaceholder" minlength="10" required></textarea>
                 <button class="button button--solid button--nav" id="sub-submit-btn" type="submit"
                   data-content="connect" aria-label="Connect">
@@ -658,11 +597,11 @@
           </div>
 
           <div class="footer__right">
-            <div class="footer__label">Phone / WhatsApp:</div>
+            <div class="footer__label" data-i18n="footer.phoneLabel">Phone / WhatsApp:</div>
             <a href="tel:+21650405554" class="button button--white footer__link">
               <span class="button__inner">+216 50 405 554</span>
             </a>
-            <div class="footer__label">Direct Contact:</div>
+            <div class="footer__label" data-i18n="footer.contactLabel">Direct Contact:</div>
             <a href="mailto:mohamedaminebenmasseoud63@gmail.com" class="button button--white footer__link maintainWidth"
               data-copy-link="mohamedaminebenmasseoud63@gmail.com" data-content="mohamedaminebenmasseoud63@gmail.com">
               <span class="button__inner linkLabel"
@@ -677,7 +616,7 @@
   </div>
 
   <!-- Floating Scroll To Top -->
-  <button class="scroll-top-btn" id="scroll-top" aria-label="Scroll to top">
+  <button class="scroll-top-btn" id="scroll-top" aria-label="Scroll to top" data-i18n-aria="footer.backToTop">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
       stroke-linecap="round" stroke-linejoin="round">
       <polyline points="18 15 12 9 6 15"></polyline>

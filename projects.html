@@ -32,8 +32,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png" />
-  <link rel="manifest" href="site.webmanifest" />
-  <meta name="theme-color" content="#0d0f17" />
+  <meta name="theme-color" content="#eceae4" />
 
   <!-- Google Fonts: Preconnect & Optimized Display Swap -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -55,7 +54,7 @@
         bms.creations <span class="dot"></span>
       </a>
 
-      <div class="nav__links rf-links">
+      <div class="nav__links rf-links" id="nav-links">
         <a href="index.html" class="link nav__link rf-link underLink" data-content="home">
           <span data-i18n="nav.home">home</span>
         </a>
@@ -84,12 +83,16 @@
         <a href="contact.html" class="button button--nav button--black">
           <span class="button__inner" data-i18n="nav.hireMe">hire me</span>
         </a>
-      </div>
+                <button class="nav__toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" data-i18n-aria="nav.toggleMenu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
     </div>
   </nav>
 
   <!-- ═══ Main Content ═══ -->
   <main id="main-content">
+    <div class="scroll-progress-bar" id="scroll-progress"></div>
 
     <!-- ═══ Projects Section ═══ -->
     <section class="section section--page-top">
@@ -207,11 +210,11 @@
       </div>
 
       <div class="footer__right">
-        <div class="footer__label">Phone / WhatsApp:</div>
+        <div class="footer__label" data-i18n="footer.phoneLabel">Phone / WhatsApp:</div>
         <a href="tel:+21650405554" class="button button--white footer__link">
           <span class="button__inner">+216 50 405 554</span>
         </a>
-        <div class="footer__label">Direct Contact:</div>
+        <div class="footer__label" data-i18n="footer.contactLabel">Direct Contact:</div>
         <a href="mailto:mohamedaminebenmasseoud63@gmail.com" class="button button--white footer__link maintainWidth"
           data-copy-link="mohamedaminebenmasseoud63@gmail.com" data-content="mohamedaminebenmasseoud63@gmail.com">
           <span class="button__inner linkLabel"
@@ -222,7 +225,12 @@
   </footer>
 
   <!-- ═══ Back to Top Button ═══ -->
-  <button class="scroll-top-btn" id="scroll-top" aria-label="Scroll to top" title="Scroll to top">↑</button>
+  <button class="scroll-top-btn" id="scroll-top" aria-label="Scroll to top" data-i18n-aria="footer.backToTop">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
 
   <script src="data/i18n.js" defer></script>
   <script src="data/projects.js" defer></script>

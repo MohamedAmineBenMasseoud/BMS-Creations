@@ -13,8 +13,22 @@ document.addEventListener("DOMContentLoaded", () => {
   renderProjectCards();
   renderMoreProjects();
 
-  // Re-render when language changes
-  window.addEventListener("bms:langchange", () => {
+  // Re-render and update filter chips when language changes
+  window.addEventListener("bms:langchange", (e) => {
+    const lang =
+      (e && e.detail && e.detail.lang) ||
+      (typeof window.bmsGetLanguage === "function"
+        ? window.bmsGetLanguage()
+        : document.documentElement.lang) ||
+      "en";
+
+    const allChip = document.querySelector(
+      '#projects-tag-list .tag-filter-chip[data-tag="all"]'
+    );
+    if (allChip && typeof I18N !== "undefined" && I18N[lang]?.projects?.allTags) {
+      allChip.textContent = I18N[lang].projects.allTags;
+    }
+
     renderProjectCards();
     renderMoreProjects();
   });
@@ -33,9 +47,19 @@ function initProjectTags() {
   });
 
   const sortedTags = Array.from(allTagsSet).sort();
+  const currentLang =
+    (typeof window.bmsGetLanguage === "function"
+      ? window.bmsGetLanguage()
+      : document.documentElement.lang) || "en";
+  const allLabel =
+    (typeof I18N !== "undefined" &&
+      I18N[currentLang] &&
+      I18N[currentLang].projects &&
+      I18N[currentLang].projects.allTags) ||
+    "All";
 
   tagListContainer.innerHTML = [
-    `<button class="tag-filter-chip active" data-tag="all" data-i18n="projects.allTags">All</button>`,
+    `<button class="tag-filter-chip active" data-tag="all" data-i18n="projects.allTags">${allLabel}</button>`,
     ...sortedTags.map(
       (tag) => `<button class="tag-filter-chip" data-tag="${tag}">${tag}</button>`
     ),
@@ -113,21 +137,25 @@ function renderProjectCards() {
       const inTitle = p.title && p.title.toLowerCase().includes(searchQuery);
       const inDesc =
         p.description && p.description.toLowerCase().includes(searchQuery);
+      const inFrDesc =
+        p.fr && p.fr.description && p.fr.description.toLowerCase().includes(searchQuery);
       const inSubtitle =
         p.subtitle && p.subtitle.toLowerCase().includes(searchQuery);
+      const inFrSubtitle =
+        p.fr && p.fr.subtitle && p.fr.subtitle.toLowerCase().includes(searchQuery);
       const inTags =
         p.tags && p.tags.some((t) => t.toLowerCase().includes(searchQuery));
       const inRole = p.role && p.role.toLowerCase().includes(searchQuery);
       const inCat = p.category && p.category.toLowerCase().includes(searchQuery);
-      return inTitle || inDesc || inSubtitle || inTags || inRole || inCat;
+      return inTitle || inDesc || inFrDesc || inSubtitle || inFrSubtitle || inTags || inRole || inCat;
     }
 
     return true;
   });
 
   const lang =
-    (typeof bmsGetLanguage === "function"
-      ? bmsGetLanguage()
+    (typeof window.bmsGetLanguage === "function"
+      ? window.bmsGetLanguage()
       : document.documentElement.lang) || "en";
   const featuredLabel =
     (typeof I18N !== "undefined" &&
@@ -151,8 +179,15 @@ function renderProjectCards() {
   }
 
   grid.innerHTML = filtered
-    .map(
-      (p) => `
+    .map((raw) => {
+      const p =
+        typeof window.bmsLocalizeProject === "function"
+          ? window.bmsLocalizeProject(raw, lang)
+          : lang === "fr" && raw.fr
+          ? { ...raw, ...raw.fr }
+          : raw;
+
+      return `
     <a href="projects/${p.id}/index.html" class="project-card glass reveal" id="card-${p.id}">
       <div class="project-card__image">
         <picture>
@@ -171,8 +206,8 @@ function renderProjectCards() {
           ${p.tags.map((t) => `<span class="tag">${t}</span>`).join("")}
         </div>
       </div>
-    </a>`
-    )
+    </a>`;
+    })
     .join("");
 
   // Trigger scroll reveals
@@ -189,8 +224,20 @@ function renderMoreProjects() {
   const container = document.getElementById("more-projects-grid");
   if (!container || typeof MORE_PROJECTS === "undefined") return;
 
-  container.innerHTML = MORE_PROJECTS.map(
-    (p) => `
+  const lang =
+    (typeof window.bmsGetLanguage === "function"
+      ? window.bmsGetLanguage()
+      : document.documentElement.lang) || "en";
+
+  container.innerHTML = MORE_PROJECTS.map((raw) => {
+    const p =
+      typeof window.bmsLocalizeProject === "function"
+        ? window.bmsLocalizeProject(raw, lang)
+        : lang === "fr" && raw.fr
+        ? { ...raw, ...raw.fr }
+        : raw;
+
+    return `
     <div class="more-project-card glass reveal" id="more-${p.id}">
       <div>
         <div class="more-project-card__header">
@@ -202,8 +249,8 @@ function renderMoreProjects() {
       <div class="more-project-card__tags">
         ${p.tags.map((t) => `<span class="tag">${t}</span>`).join("")}
       </div>
-    </div>`
-  ).join("");
+    </div>`;
+  }).join("");
 
   requestAnimationFrame(() => {
     container.querySelectorAll(".reveal").forEach((el, i) => {
