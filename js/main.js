@@ -668,42 +668,6 @@ function initFlipStack() {
     });
   }
 
-  // Touch Swipe Gesture for mobile
-  let touchStartY = 0;
-  let touchStartX = 0;
-
-  stage.addEventListener(
-    "touchstart",
-    (e) => {
-      if (e.touches && e.touches[0]) {
-        touchStartY = e.touches[0].clientY;
-        touchStartX = e.touches[0].clientX;
-      }
-    },
-    { passive: true }
-  );
-
-  stage.addEventListener(
-    "touchend",
-    (e) => {
-      if (!e.changedTouches || !e.changedTouches[0]) return;
-      const deltaY = e.changedTouches[0].clientY - touchStartY;
-      const deltaX = e.changedTouches[0].clientX - touchStartX;
-
-      // Vertical swipe intent
-      if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 40) {
-        if (deltaY < 0) {
-          // Swiped up -> next
-          scrollToCard(currentActiveIndex + 1);
-        } else {
-          // Swiped down -> prev
-          scrollToCard(currentActiveIndex - 1);
-        }
-      }
-    },
-    { passive: true }
-  );
-
   // Keyboard accessibility
   stage.setAttribute("tabindex", "0");
   stage.addEventListener("keydown", (e) => {

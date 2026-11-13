@@ -251,6 +251,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ── Utilities ── */
+.container,
+main,
+section,
+footer {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .container {
   width: 100%;
   max-width: var(--container-max);
@@ -1344,6 +1352,7 @@ body::before {
   color: #0e0e0e;
 }
 
+.contact-item > div:not(.contact-item__icon),
 .contact-item__text {
   min-width: 0;
   flex: 1;
@@ -2476,6 +2485,10 @@ html.loading body {
 }
 
 @media (max-width: 600px) {
+  .flip-stack-container {
+    min-height: 195vh;
+  }
+
   .flip-stack-stage {
     top: 108px;
     height: calc(100vh - 116px);
@@ -2545,6 +2558,7 @@ html.loading body {
 
   a[href^="mailto:"].contact-item__value,
   .contact-item__value--email {
+    font-size: clamp(0.68rem, 3.2vw, 0.85rem);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3325,6 +3339,10 @@ body.nav-open .nav {
     color: var(--rf-text);
   }
 
+  .flip-stack-container {
+    min-height: 210vh;
+  }
+
   .flip-stack-stage {
     top: 108px;
     height: calc(100vh - 116px);
@@ -3335,6 +3353,28 @@ body.nav-open .nav {
   .subscribe {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
+  }
+  .flip-stack-end {
+    margin: 1.5rem auto 1.5rem;
+    padding: 2rem 1.25rem;
+  }
+
+  /* ── Contact & Layout (Mobile) ── */
+  .container,
+  main,
+  section,
+  footer {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .contact-grid,
+  .contact-info,
+  .contact-info-card,
+  .contact-form-container {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   /* ── Contact & Top Spacing (Mobile) ── */
