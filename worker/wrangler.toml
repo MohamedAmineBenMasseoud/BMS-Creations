@@ -1,0 +1,12 @@
+name = "bms-portfolio-chatbot"
+main = "src/index.js"
+compatibility_date = "2024-04-01"
+
+[observability]
+enabled = true
+
+[vars]
+GEMINI_MODEL = "gemini-3.1-flash-lite"
+
+# The GEMINI_API_KEY secret must be added securely via:
+# npx wrangler secret put GEMINI_API_KEY
