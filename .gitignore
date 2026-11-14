@@ -1,0 +1,7 @@
+.dev.vars
+.env
+node_modules/
+.wrangler/
+scratch/
+*.py
+*.mjs

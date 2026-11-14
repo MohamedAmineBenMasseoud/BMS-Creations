@@ -628,7 +628,7 @@ function initFlipStack() {
         const under = -diff; // 0 for exact active, positive for cards underneath
         const translateY = Math.min(under * 14, 42); // px
         const scale = Math.max(0.92, 1 - under * 0.035);
-        const opacity = under < 2.5 ? 1 : 0;
+        const opacity = under <= 2 ? 1 : Math.max(0, 1 - (under - 2) * 2);
         const pointerEvents = under < 0.3 ? "auto" : "none";
         const zIndex = 50 - i;
 

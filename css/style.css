@@ -2143,7 +2143,7 @@ html.loading body {
 .flip-stack-container {
   position: relative;
   width: 100%;
-  min-height: 380vh;
+  min-height: 300vh;
   box-sizing: border-box;
 }
 
@@ -2403,7 +2403,7 @@ html.loading body {
 .flip-stack-end {
   width: 100%;
   max-width: 800px;
-  margin: 3rem auto 2.5rem;
+  margin: 2.5rem auto 3rem;
   text-align: center;
   padding: 3rem 2rem;
   background: #ffffff;
@@ -2411,7 +2411,7 @@ html.loading body {
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.04);
   position: relative;
-  z-index: 12;
+  z-index: 11;
   box-sizing: border-box;
 }
 
@@ -2485,10 +2485,6 @@ html.loading body {
 }
 
 @media (max-width: 600px) {
-  .flip-stack-container {
-    min-height: 195vh;
-  }
-
   .flip-stack-stage {
     top: 108px;
     height: calc(100vh - 116px);
@@ -3340,7 +3336,7 @@ body.nav-open .nav {
   }
 
   .flip-stack-container {
-    min-height: 210vh;
+    min-height: 240vh;
   }
 
   .flip-stack-stage {
@@ -3355,7 +3351,7 @@ body.nav-open .nav {
     padding-right: 1.25rem;
   }
   .flip-stack-end {
-    margin: 1.5rem auto 1.5rem;
+    margin: 1.5rem auto 2rem;
     padding: 2rem 1.25rem;
   }
 
